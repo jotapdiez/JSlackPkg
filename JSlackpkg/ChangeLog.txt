@@ -1,0 +1,15 @@
+2012-07-02 ============================================
+- Agregado el estado como un ENUM
+- Eliminado el campo Dependencies de PackageInformation e implementado el Estado y los botones de install/uninstall (activados o desactivados)
+- Implementado el Filtrar en PackageList para la lista de paquetes
+- TableModel maneja el "data" de la tabla de forma propia lo que permite pedir directamente el objeto al hacer doble-click en la tabla
+
+2012-07-01 ============================================
+- Agregado doble click a la lista de paquetes.
+- Agregada precarga de packetes instalados al iniciar la aplicacion
+- Arreglado el alto del campo nombre en el panel de informacion
+- Arreglada la descripcion donde aparecia el "[nombre_paquete]:" al principio de algunas lineas
+- Eliminadas las columnas "Estado" y "Descripcion" de la lista de paquetes
+- Agregado algo de JavaDoc
+- Implementado Threads para el Update y la carga inicial de paquetes instalados
+- Agregados algunos items de los menues Archivo, Ayuda, Opciones y Acciones

@@ -1,0 +1,2 @@
+ToDo:
+.- org.pushingpixels.substance.api.UiThreadingViolationException: Component state change must be done on Event Dispatch Thread: http://foro.chuidiang.com/java-j2se/error-en-jprogressbar/
