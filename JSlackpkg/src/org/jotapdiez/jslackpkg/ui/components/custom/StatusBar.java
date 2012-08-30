@@ -21,7 +21,6 @@ public class StatusBar extends JPanel
     private JLabel lComponentFocusStatusText = new JLabel();
     private JLabel lLastActionStatusText = new JLabel();
     private JProgressBar progressBar = new JProgressBar();
-    private int progressBarValue = 0;
 	
     private StatusBar() {
         initComponents();
@@ -90,7 +89,12 @@ public class StatusBar extends JPanel
     
     public void increaseProgress()
     {
-    	progressBar.setValue(++progressBarValue);
+    	progressBar.setValue(progressBar.getValue()+1);
+    }
+    
+    public void increaseProgress(int size)
+    {
+    	progressBar.setValue(size);
     }
     
     public void resetProgress()
@@ -101,6 +105,8 @@ public class StatusBar extends JPanel
     
     public void setFocusComponentText(String text)
     {
+    	if (text.equals(""))
+    		text = " ";
     	lComponentFocusStatusText.setText(text);
     }
 
@@ -109,5 +115,10 @@ public class StatusBar extends JPanel
     	lLastActionStatusText.setText(text);
     }
     
+	public void resetText()
+	{
+		setFocusComponentText("");		
+	}
+	
 	private static final long serialVersionUID = 5684880052627715552L;
 }

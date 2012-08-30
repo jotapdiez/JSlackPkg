@@ -8,8 +8,9 @@ public interface PackageManager
 {
 	public void update();
 	
-	public void upgrade();
-	public void install();
+	public boolean upgrade(Package packageItem);
+	public boolean install(Package packageItem);
+	public boolean remove(Package packageItem);
 	
 	public void clean();
 

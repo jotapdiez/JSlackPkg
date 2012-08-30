@@ -31,16 +31,15 @@ public class Package
 			return new String(_label);
 		}
 	}
+	
+	PackageFileName        _pName = null;
+	
 	private char[]			_location			= null;
 	private char[]			_fileName			= null;
-	private char[]			_name				= null;
 	private double			_sizeUncompressed	= 0;
 	private double			_sizeCompressed		= 0;
 	private char[]			_description		= null;
 
-	private char[]			_version			= null;
-	private char[]			_arch    			= null;
-	private char[]			_buildNumber		= null;
 	private STATE			_state				= STATE.UNKNOWN;
 
 	public void setState(STATE state)
@@ -67,6 +66,8 @@ public class Package
 
 	public void setFileName(String fileName)
 	{
+		_pName = new PackageFileName(fileName);
+		
 		int indexOfNewLine = fileName.indexOf("\n");
 		if (indexOfNewLine > -1)
 			fileName = fileName.substring(0, indexOfNewLine);
@@ -127,34 +128,14 @@ public class Package
 		return "";
 	}
 
-	@Deprecated
-	public void setRealName(String realName)
+	public String getFullName()
 	{
-		setRealName(realName.toCharArray());
+		return _pName.getFullName();
 	}
 
-	public void setRealName(char[] realName)
+	public String getName()
 	{
-		_name = realName;
-	}
-
-	public String getRealName()
-	{
-		if (_name != null)
-			return new String(_name);
-		return "";
-	}
-
-	public void setVersion(char[] version)
-	{
-		_version = version;
-	}
-
-	public String getVersion()
-	{
-		if (_version != null)
-			return new String(_version);
-		return "";
+		return _pName.getName();
 	}
 
 	public String getUncompressedSize()
@@ -165,6 +146,10 @@ public class Package
 	public String getCompressedSize()
 	{
 		return parseSize(_sizeCompressed);
+	}
+	
+	public String getVersion() {
+		return _pName.getVersion();
 	}
 	
 	private String parseSize(double sizeToParse)
@@ -184,35 +169,25 @@ public class Package
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 		return String.valueOf(twoDForm.format(size)) + String.valueOf(sizeType);	}
 	
-	public void setArch(char[] arch)
-	{
-		_arch = arch;
-	}
-
-	public void setBuildNumber(char[] build)
-	{
-		_buildNumber = build;
-	}
-
 	public String getBuild()
 	{
-		return new String(_buildNumber);
+		return _pName.getBuild();
 	}
 	
 	@Override
 	public boolean equals(Object obj)
 	{
 		Package tmpObj = (Package) obj;
-		if (!Arrays.equals(tmpObj._name, _name))
+		if (!Arrays.equals(tmpObj._pName._name, _pName._name))
 			return false;
 		
-		if (!Arrays.equals(tmpObj._version,_version))
+		if (!Arrays.equals(tmpObj._pName._version,_pName._version))
 			return false;
 		
-		if (!Arrays.equals(tmpObj._arch,_arch))
+		if (!Arrays.equals(tmpObj._pName._arch,_pName._arch))
 			return false;
 		
-		if (!Arrays.equals(tmpObj._buildNumber,_buildNumber))
+		if (!Arrays.equals(tmpObj._pName._build,_pName._build))
 			return false;
 		
 		return true;

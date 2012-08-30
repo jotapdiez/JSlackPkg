@@ -118,7 +118,7 @@ public class MainUI extends JFrame
     	
 		Runnable loadsStartup = new Runnable() {
 			public void run() {
-				packageManager.getPackage("");
+				packageManager.getPackage(""); // Para tener la lista completa de paquetes (instalados, sin instalar, etc)
 			}
 		};
 		Thread t = new Thread(loadsStartup);

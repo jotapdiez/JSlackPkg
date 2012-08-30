@@ -76,7 +76,7 @@ public class TableModel extends DefaultTableModel
 		{
 			switch (col) {
 			case 0:
-				ret = packageItem.getRealName() + " (" + packageItem.getFileName() + ")";
+				ret = packageItem.getName() + " (" + packageItem.getFileName() + ")";
 				break;
 			case 1:
 				ret = packageItem.getState();

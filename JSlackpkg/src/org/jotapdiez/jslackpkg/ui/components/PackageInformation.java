@@ -17,6 +17,8 @@ import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
 import org.jotapdiez.jslackpkg.utils.ResourceMap;
 import javax.swing.JCheckBox;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class PackageInformation extends JPanel
 {
@@ -156,7 +158,19 @@ public class PackageInformation extends JPanel
 					FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 	
 			btnInstall.setEnabled(false);
+			btnInstall.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					boolean succesful = packageManager.install(_packageItem);
+				}
+			});
 			btnUninstall.setEnabled(false);
+			btnUninstall.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					boolean succesful = packageManager.remove(_packageItem);
+				}
+			});
 			btnBlackListAdd.setEnabled(false);
 			btnBlackListRemove.setEnabled(false);
 			blackListPanel.add(btnBlackListAdd, "1, 3");
@@ -179,7 +193,7 @@ public class PackageInformation extends JPanel
 
 	private void mapPackage()
 	{
-		txtName.setText(_packageItem.getRealName());
+		txtName.setText(_packageItem.getName());
 		txtVersion.setText(_packageItem.getVersion());
 		txtInstalledSize.setText(_packageItem.getUncompressedSize());
 		txtSize.setText(_packageItem.getCompressedSize());
@@ -195,7 +209,6 @@ public class PackageInformation extends JPanel
 		
 		btnInstall.setEnabled(!installed);
 		btnUninstall.setEnabled(installed);
-		
 	}
 
 	private static final long	serialVersionUID	= 7546213147519598392L;

@@ -13,16 +13,6 @@ public class SlackpkgPackageManager implements PackageManager
 	}
 
 	@Override
-	public void upgrade() {
-
-	}
-
-	@Override
-	public void install() {
-
-	}
-
-	@Override
 	public void clean() {
 
 	}
@@ -65,5 +55,20 @@ public class SlackpkgPackageManager implements PackageManager
 	@Override
 	public Package getPackage(String packageFileName) {
 		return null;
+	}
+
+	@Override
+	public boolean remove(Package packageItem) {
+		return false;
+	}
+
+	@Override
+	public boolean upgrade(Package packageItem) {
+		return false;
+	}
+
+	@Override
+	public boolean install(Package packageItem) {
+		return false;
 	}
 }

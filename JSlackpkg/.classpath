@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="org/jotapdiez/jslackpkg/test/JasperReportTest.java|org/jotapdiez/jslackpkg/test/ReportJRXMLGenerator.java|org/jotapdiez/jslackpkg/test/ReportJRXMLGeneratorDynamicJasper.java" kind="src" path="src"/>
+	<classpathentry excluding="org/jotapdiez/jslackpkg/test/JasperReportTest.java|org/jotapdiez/jslackpkg/test/ReportJRXMLGenerator.java|org/jotapdiez/jslackpkg/test/ReportJRXMLGeneratorDynamicJasper.java|org/jotapdiez/jslackpkg/ui/components/handlers/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/forms-1.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/substance-6.2.jar"/>
