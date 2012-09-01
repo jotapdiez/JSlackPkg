@@ -72,6 +72,8 @@ public class PackagesList extends JPanel
 				{
 					TableModel model = (TableModel) table.getModel();
 					int indexSelectedRow = table.getSelectedRow();
+					indexSelectedRow = table.convertRowIndexToModel(indexSelectedRow);
+					
 					Package selectedPackage = model.getValueAt(indexSelectedRow);
 					PackageInformation.getInstance(null).setPackage(selectedPackage);
 				}

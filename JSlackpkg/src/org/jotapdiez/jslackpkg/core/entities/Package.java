@@ -178,16 +178,38 @@ public class Package
 	public boolean equals(Object obj)
 	{
 		Package tmpObj = (Package) obj;
+		if (Arrays.equals(tmpObj._pName._name, _pName._name))
+			return true;
+
+//		if (!Arrays.equals(tmpObj._pName._name, _pName._name))
+//			return false;
+//		
+//		if (!Arrays.equals(tmpObj._pName._version, _pName._version))
+//			return false;
+//		
+//		if (!Arrays.equals(tmpObj._pName._arch, _pName._arch))
+//			return false;
+//		
+//		if (!Arrays.equals(tmpObj._pName._build, _pName._build))
+//			return false;
+		
+		return false;
+	}
+
+	public boolean equalsExact(Object obj)
+	{
+		Package tmpObj = (Package) obj;
+
 		if (!Arrays.equals(tmpObj._pName._name, _pName._name))
 			return false;
 		
-		if (!Arrays.equals(tmpObj._pName._version,_pName._version))
+		if (!Arrays.equals(tmpObj._pName._version, _pName._version))
 			return false;
 		
-		if (!Arrays.equals(tmpObj._pName._arch,_pName._arch))
+		if (!Arrays.equals(tmpObj._pName._arch, _pName._arch))
 			return false;
 		
-		if (!Arrays.equals(tmpObj._pName._build,_pName._build))
+		if (!Arrays.equals(tmpObj._pName._build, _pName._build))
 			return false;
 		
 		return true;

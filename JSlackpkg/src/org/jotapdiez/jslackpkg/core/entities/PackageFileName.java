@@ -31,7 +31,9 @@ class PackageFileName
 			 setBuild(matcher.group(4).toCharArray());
 			 
 			 _fullName = fileName.toCharArray();
-		}			
+		}
+//		else
+//			System.out.println("Invalida package filename: " + fileName);
 	}
 	
 	public String getFullName()
@@ -43,7 +45,9 @@ class PackageFileName
 	
 	public String getBuild()
 	{
-		return new String(_build);
+		if (_build != null)
+			return new String(_build);
+		return "";
 	}
 	
 	public void setBuild(char[] _build) {
