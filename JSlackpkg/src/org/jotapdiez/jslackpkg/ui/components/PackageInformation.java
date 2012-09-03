@@ -92,17 +92,20 @@ public class PackageInformation extends JPanel
 
 		informationPanel.add(txtName, "5, 1, fill, default");
 		txtName.setColumns(10);
+		txtName.setEditable(false);
 
 		JLabel lblSize = new JLabel("Tamano"); // TODO: A archivo de lenguajes
 		informationPanel.add(lblSize, "2, 7");
 
 		txtSize.setColumns(10);
+		txtSize.setEditable(false);
 		informationPanel.add(txtSize, "5, 7, fill, default");
 
 		JLabel lblInstalledSize = new JLabel("Tamano Instalado"); // TODO: A archivo de lenguajes
 		informationPanel.add(lblInstalledSize, "2, 9");
 
 		txtInstalledSize.setColumns(10);
+		txtInstalledSize.setEditable(false);
 		informationPanel.add(txtInstalledSize, "5, 9, fill, default");
 
 		JLabel lblIsDefault = new JLabel("Es default?"); // TODO: A archivo de lenguajes
@@ -115,6 +118,7 @@ public class PackageInformation extends JPanel
 
 		txtDescription.setRows(15);
 		txtDescription.setColumns(10);
+		txtDescription.setEditable(false);
 		informationPanel.add(txtDescription, "5, 13, fill, fill");
 
 		JLabel lblVersion = new JLabel("Version"); // TODO: A archivo de lenguajes
@@ -122,12 +126,14 @@ public class PackageInformation extends JPanel
 
 		informationPanel.add(txtVersion, "5, 3, fill, default");
 		txtVersion.setColumns(10);
-
+		txtVersion.setEditable(false);
+		
 		JLabel lblState = new JLabel("Estado"); // TODO: A archivo de lenguajes
 		informationPanel.add(lblState, "2, 5, left, default");
 
 		informationPanel.add(txtState, "5, 5, fill, default");
 		txtState.setColumns(10);
+		txtState.setEditable(false);
 	}
 
 	public void buildActionsPanel()
@@ -161,14 +167,14 @@ public class PackageInformation extends JPanel
 			btnInstall.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					boolean succesful = packageManager.install(_packageItem);
+					/*boolean succesful = */packageManager.install(_packageItem);
 				}
 			});
 			btnUninstall.setEnabled(false);
 			btnUninstall.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					boolean succesful = packageManager.remove(_packageItem);
+					/*boolean succesful = */packageManager.remove(_packageItem);
 				}
 			});
 			btnBlackListAdd.setEnabled(false);

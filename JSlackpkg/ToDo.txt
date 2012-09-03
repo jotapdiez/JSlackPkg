@@ -1,2 +1,11 @@
 ToDo:
 .- org.pushingpixels.substance.api.UiThreadingViolationException: Component state change must be done on Event Dispatch Thread: http://foro.chuidiang.com/java-j2se/error-en-jprogressbar/
+
+Parseo de changelog.txt
+.- Ver descripcion en paquetes que tienen signos como + (ej.: dvd+rw-tools-7.1-i486-2)
+
+Lista de paquetes.
+- Mostrar checkbos para que oculte o muestre los que estan en blacklist
+- Permitir seleccionar mas de un paquete para hacer alguna accion en todos los seleccionados.
+   \- Agregar boton seleccionar todos/ninguno 
+- Filtrar (mostrar/ocultar) paquetes de SlackBuilds ("-Sbo" en la build)

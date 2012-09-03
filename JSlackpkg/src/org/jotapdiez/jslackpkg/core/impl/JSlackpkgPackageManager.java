@@ -309,7 +309,7 @@ public class JSlackpkgPackageManager implements PackageManager
 				String date = dateScanner.next();
 //				System.out.println("=====================================================================================Date:\n" + date);
 //				parseChangeLogDateScanner(date);
-				boolean validDate = parseChangeLogDateRegexp2(date);
+				/*boolean validDate = */parseChangeLogDateRegexp2(date);
 //				if (!validDate)
 //					break;
 			}
@@ -671,7 +671,7 @@ public class JSlackpkgPackageManager implements PackageManager
 	{
 		try {
 			StatusBar.getInstance().setFocusComponentText("Descargando paquete "+fileName); //TODO: A archivo de lenguajes
-			String state = "Descargando: ";
+//			String state = "Descargando: ";
 //			infoPanel.setState(state);
 //			infoPanel.updateProgress(0);
 //			logger.debug("downloadFile:"+remoteFile+" to "+localFile);
@@ -682,7 +682,7 @@ public class JSlackpkgPackageManager implements PackageManager
 
 			StatusBar.getInstance().setTotal(conexion.getContentLength());
 			
-			int lenghtOfFile = conexion.getContentLength();
+//			int lenghtOfFile = conexion.getContentLength();
 //			infoPanel.setTotalPB(lenghtOfFile);
 			InputStream input = new BufferedInputStream(url.openStream());
 			
