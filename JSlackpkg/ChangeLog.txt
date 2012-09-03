@@ -1,3 +1,20 @@
+2012-09-03 ============================================
+- Al seleccionar paquete de la lista se muestra el panel de info.
+- Agregados los botones para eliminar, actualizar o instalar paquetes en bulk. 
+- Agregados botones para el blacklist en bulk
+
+2012-09-02 ============================================
+- Modificada la tabla (lista de paquetes) para que se pueda seleccionar paquetes.
+- Creado un SplitPane propio para evitar los conflictos con el JSplitPane.
+
+2012-08-30 ============================================
+-  Arreglado el parseo del ChangeLog.txt. Ahora se interpreta correctamente y muestra (o deberia) la lista correcta de paquetes a actualizar, instalar o borrar.
+
+2012-08-30 ============================================
+- Implementado el instalar/borrar paquete
+- Agregada mas info en el status bar
+- Optimizaciones varias
+
 2012-07-02 ============================================
 - Agregado el estado como un ENUM
 - Eliminado el campo Dependencies de PackageInformation e implementado el Estado y los botones de install/uninstall (activados o desactivados)

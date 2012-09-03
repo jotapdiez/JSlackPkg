@@ -29,13 +29,12 @@ public class JSlackpkg {
 	}
 	
 	public static void main(String[] args) {
-		initLookAndFeel();
+//		initLookAndFeel();
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainUI window = new MainUI();
-					window.setVisible(true);
+					MainUI.getInstance().setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -10,6 +10,7 @@ import com.jgoodies.forms.factories.FormFactory;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.jotapdiez.jslackpkg.core.entities.Package;
@@ -25,7 +26,6 @@ public class PackageInformation extends JPanel
 	private final JTextField			txtName				= new JTextField();
 	private final JTextField			txtVersion			= new JTextField();
 	private final JTextField			txtState			= new JTextField();
-	private final JCheckBox				cbIsDefault			= new JCheckBox();
 	private final JTextField			txtSize				= new JTextField();
 	private final JTextField			txtInstalledSize	= new JTextField();
 	private final JTextArea				txtDescription		= new JTextArea();
@@ -39,16 +39,16 @@ public class PackageInformation extends JPanel
 
 	private Package						_packageItem		= null;
 
-	private static PackageInformation	_instance			= null;
+//	private static PackageInformation	_instance			= null;
+//
+//	public static PackageInformation getInstance(PackageManager packageManager)
+//	{
+//		if (_instance == null)
+//			_instance = new PackageInformation(packageManager);
+//		return _instance;
+//	}
 
-	public static PackageInformation getInstance(PackageManager packageManager)
-	{
-		if (_instance == null)
-			_instance = new PackageInformation(packageManager);
-		return _instance;
-	}
-
-	private PackageInformation(PackageManager packageManager)
+	public PackageInformation(PackageManager packageManager)
 	{
 		this.packageManager = packageManager;
 		setLayout(new BorderLayout(0, 0));
@@ -81,11 +81,8 @@ public class PackageInformation extends JPanel
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
+				FormFactory.RELATED_GAP_ROWSPEC,}));
 
 		JLabel lblName = new JLabel("Nombre");
 		informationPanel.add(lblName, "2, 1, left, default");
@@ -108,18 +105,15 @@ public class PackageInformation extends JPanel
 		txtInstalledSize.setEditable(false);
 		informationPanel.add(txtInstalledSize, "5, 9, fill, default");
 
-		JLabel lblIsDefault = new JLabel("Es default?"); // TODO: A archivo de lenguajes
-		informationPanel.add(lblIsDefault, "2, 11");
-
-		informationPanel.add(cbIsDefault, "5, 11, fill, default");
-
 		JLabel lblDescription = new JLabel("Descripcion"); // TODO: A archivo de lenguajes
-		informationPanel.add(lblDescription, "2, 13, left, top");
+		informationPanel.add(lblDescription, "2, 11, left, top");
 
-		txtDescription.setRows(15);
+		txtDescription.setRows(5);
 		txtDescription.setColumns(10);
 		txtDescription.setEditable(false);
-		informationPanel.add(txtDescription, "5, 13, fill, fill");
+		
+		JScrollPane scrollPane = new JScrollPane(txtDescription);
+		informationPanel.add(scrollPane, "5, 11, fill, fill");
 
 		JLabel lblVersion = new JLabel("Version"); // TODO: A archivo de lenguajes
 		informationPanel.add(lblVersion, "2, 3, left, default");
