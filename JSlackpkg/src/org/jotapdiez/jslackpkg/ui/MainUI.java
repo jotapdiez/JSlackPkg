@@ -20,8 +20,8 @@ import org.jotapdiez.jslackpkg.ui.components.PackageInformation;
 import org.jotapdiez.jslackpkg.ui.components.PackagesList;
 import org.jotapdiez.jslackpkg.ui.components.Settings;
 import org.jotapdiez.jslackpkg.ui.components.custom.StatusBar;
+import org.jotapdiez.jslackpkg.ui.components.custom.splitPane.SplitPane;
 import org.jotapdiez.jslackpkg.utils.ResourceMap;
-import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.JTabbedPane;
 
@@ -37,7 +37,7 @@ public class MainUI extends JFrame
 	private final JButton btnInstallnew = new JButton("Install New", ResourceMap.installIcon); //TODO: A archivo de lenguajes
 	private final JButton btnSettings = new JButton("Settings", ResourceMap.settingsIcon); //TODO: A archivo de lenguajes
 
-	private final JSplitPane splitPane = new JSplitPane();
+	private final SplitPane splitPane = new SplitPane(false);
     
 	private PackageManager packageManager = null;
 	
@@ -92,7 +92,7 @@ public class MainUI extends JFrame
 				}
 			});
     		
-    		toolBar.addSeparator();
+//    		toolBar.addSeparator();
     		toolBar.add(btnClean);
     		btnClean.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -111,10 +111,10 @@ public class MainUI extends JFrame
     	getContentPane().add(tabbedPane, BorderLayout.CENTER);
     	tabbedPane.add("Packages", splitPane); //TODO: A archivo de lenguajes
     	tabbedPane.add("Settings", new Settings()); //TODO: A archivo de lenguajes
-    	splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+//    	splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
     	
-    	splitPane.setTopComponent(new PackagesList(packageManager));
-    	splitPane.setBottomComponent(PackageInformation.getInstance(packageManager));
+    	splitPane.addTopComponent(new PackagesList(packageManager));
+    	splitPane.addBottomComponent(PackageInformation.getInstance(packageManager));
     	
 		Runnable loadsStartup = new Runnable() {
 			public void run() {
@@ -282,9 +282,9 @@ public class MainUI extends JFrame
             @Override
             public void run() {
         		setExtendedState(JFrame.MAXIMIZED_BOTH);
-            	splitPane.setOneTouchExpandable(true);
-//            	splitPane.getBottomComponent().setMinimumSize(new Dimension());
-            	splitPane.setDividerLocation(1.0d);
+//            	splitPane.setOneTouchExpandable(true);
+////            	splitPane.getBottomComponent().setMinimumSize(new Dimension());
+//            	splitPane.setDividerLocation(1.0d);
             }
         });
     }

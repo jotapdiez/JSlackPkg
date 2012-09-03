@@ -29,7 +29,7 @@ public class JSlackpkg {
 	}
 	
 	public static void main(String[] args) {
-//		initLookAndFeel();
+		initLookAndFeel();
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

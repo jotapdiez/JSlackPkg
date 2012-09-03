@@ -22,7 +22,7 @@ public class ResourceMap
 //	public static ImageIcon		searchIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/icon-search.png"));
 //	public static ImageIcon		cleanIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/icon-clean.png"));
 //	public static ImageIcon		deleteIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/icon-delete.png"));
-//	public static ImageIcon		saveIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/icon-save.png"));
+	public static ImageIcon		closeIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-close.png"));
 	public static ImageIcon		updateIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-update.png"));
 	public static ImageIcon		upgradeIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-upgrade.png"));
 	public static ImageIcon		installIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-install.png"));
