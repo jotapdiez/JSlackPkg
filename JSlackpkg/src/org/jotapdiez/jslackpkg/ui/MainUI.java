@@ -40,8 +40,20 @@ public class MainUI extends JFrame
 	private final SplitPane splitPane = new SplitPane(false);
     
 	private PackageManager packageManager = null;
+	private PackageInformation packageInformation = null;
+	private PackagesList packagesList = null;
 	
-	public MainUI() {
+	private static MainUI instance = null;
+	
+	
+	public static MainUI getInstance()
+	{
+		if (instance == null)
+			instance = new MainUI();
+		return instance;
+	}
+	
+	private MainUI() {
 		packageManager = new JSlackpkgPackageManager();
 		initialize();
 	}
@@ -113,8 +125,11 @@ public class MainUI extends JFrame
     	tabbedPane.add("Settings", new Settings()); //TODO: A archivo de lenguajes
 //    	splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
     	
-    	splitPane.addTopComponent(new PackagesList(packageManager));
-    	splitPane.addBottomComponent(PackageInformation.getInstance(packageManager));
+    	packageInformation = new PackageInformation(packageManager);
+    	packagesList = new PackagesList(packageManager);
+    	
+    	splitPane.addTopComponent(packagesList);
+    	splitPane.addBottomComponent(packageInformation);
     	
 		Runnable loadsStartup = new Runnable() {
 			public void run() {
@@ -291,4 +306,9 @@ public class MainUI extends JFrame
 
 	private static final long serialVersionUID = 5009947455770939715L;
 	private final JTabbedPane tabbedPane = new JTabbedPane();
+
+	public void showPackageInformation(Package packageItem) {
+		packageInformation.setPackage(packageItem);
+		splitPane.showPanel();
+	}
 }

@@ -22,6 +22,7 @@ import javax.swing.border.TitledBorder;
 
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
+import org.jotapdiez.jslackpkg.ui.MainUI;
 import org.jotapdiez.jslackpkg.ui.components.models.PackagesTable;
 import org.jotapdiez.jslackpkg.ui.components.models.PackagesTableModel;
 
@@ -37,6 +38,7 @@ public class PackagesList extends JPanel
 	private PackagesTable		 table            = null;
 	private JTextField	 txtFilter        = null;
 	private final JLabel lblPackageCount  = new JLabel();
+	JPanel panelButtonsActions = new JPanel();
 	
 //	private long lastTimeTyped = 0;
 	
@@ -113,7 +115,7 @@ public class PackagesList extends JPanel
 					indexSelectedRow = table.convertRowIndexToModel(indexSelectedRow);
 					
 					Package selectedPackage = model.getValueAt(indexSelectedRow);
-					PackageInformation.getInstance(null).setPackage(selectedPackage);
+					showPackageInformation(selectedPackage);
 				}
 			}
 		});
@@ -121,18 +123,38 @@ public class PackagesList extends JPanel
 		scrollPane.setViewportView(table);
 		splitPane.setBottomComponent(panel);
 		
-		JPanel panelButtonsActions = new JPanel();
 		FlowLayout fl_panelButtonsActions = (FlowLayout) panelButtonsActions.getLayout();
+		fl_panelButtonsActions.setHgap(1);
 		fl_panelButtonsActions.setAlignment(FlowLayout.LEFT);
 		fl_panelButtonsActions.setVgap(2);
 		panel.add(panelButtonsActions, BorderLayout.SOUTH);
 		
-		JCheckBox chckbxShowHideBlacklist = new JCheckBox("Mostrar/Ocultar paquetes en blacklist");
-		panelButtonsActions.add(chckbxShowHideBlacklist);
+		JPanel panelAcciones = new JPanel();
+		panelAcciones.setBorder(new TitledBorder(null, "Acciones", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelButtonsActions.add(panelAcciones);
 		
-		JButton btnSelected = new JButton("selected");
-		panelButtonsActions.add(btnSelected);
-		btnSelected.addActionListener(new ActionListener() {
+		JButton btnInstallSelected = new JButton("Instalar");
+		panelAcciones.add(btnInstallSelected);
+		
+		JButton btnActualizar = new JButton("Actualizar");
+		panelAcciones.add(btnActualizar);
+		
+		JButton btnEliminar = new JButton("Eliminar");
+		panelAcciones.add(btnEliminar);
+		
+		JPanel panelBlackList = new JPanel();
+		panelBlackList.setBorder(new TitledBorder(null, "BlackList", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelButtonsActions.add(panelBlackList);
+		
+		JCheckBox chckbxShowHideBlacklist = new JCheckBox("Mostrar/Ocultar");
+		panelBlackList.add(chckbxShowHideBlacklist);
+		
+		JButton btnAgregar = new JButton("Agregar");
+		panelBlackList.add(btnAgregar);
+		
+		JButton btnEliminar_1 = new JButton("Eliminar");
+		panelBlackList.add(btnEliminar_1);
+		btnInstallSelected.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				List<Package> list = ((PackagesTableModel) table.getModel()).getSelected();
@@ -144,6 +166,11 @@ public class PackagesList extends JPanel
 		add(lblPackageCount, BorderLayout.SOUTH);
 	}
 
+	private void showPackageInformation(Package selectedPackage)
+	{
+		MainUI.getInstance().showPackageInformation(selectedPackage);
+	}
+	
 	public void addPackages(List<Package> packages)
 	{
 		resetFilter();
