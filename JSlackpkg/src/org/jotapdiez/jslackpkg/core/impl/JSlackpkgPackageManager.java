@@ -207,6 +207,7 @@ public class JSlackpkgPackageManager implements PackageManager
 //		String realName = null;
 		
 		Package packageItem = null;
+		String descriptionRegexp = "^#NAME#:[ ]?";
 		while (scannerLinea.hasNext())
 		{
 			String itemInfo = scannerLinea.next().replace("PACKAGE", "").trim();
@@ -220,6 +221,7 @@ public class JSlackpkgPackageManager implements PackageManager
 				{
 					packageItem.setDescription(description.trim());
 					description = "";
+					descriptionRegexp = "^#NAME#:[ ]?";
 				}
 				
 				if (packageItem != null)
@@ -231,7 +233,9 @@ public class JSlackpkgPackageManager implements PackageManager
 					continue;
 				
 				packageItem.setFileName(fileName);
-//				System.out.println("NAME: " + itemInfo.replace("NAME:", "").trim());
+				descriptionRegexp = descriptionRegexp.replace("#NAME#", packageItem.getName(true));
+				
+				System.out.println("descriptionRegexp: " + descriptionRegexp);
 			}else if (itemInfo.indexOf("LOCATION:") > -1)
 				packageItem.setLocation(itemInfo.replace("LOCATION:", "").trim());
 			else if (itemInfo.indexOf("SIZE") > -1)
@@ -248,6 +252,8 @@ public class JSlackpkgPackageManager implements PackageManager
 				
 			}else if (isInDescription && itemInfo.matches("[^:]*:[\\s]?.*"))
 			{
+//				if (descriptionRegexp.indexOf("#NAME#") > -1)
+//					descriptionRegexp = descriptionRegexp.replace("#NAME#", packageItem.getName(true));
 //				if (realName == null)
 //				{
 //					Pattern pattern = Pattern.compile("([^:]*):[\\s]?.*");
@@ -261,7 +267,7 @@ public class JSlackpkgPackageManager implements PackageManager
 //				Pattern pattern = Pattern.compile("[^:]*:[\\s]?");
 //				Matcher matcher = pattern.matcher(itemInfo);
 //				description += matcher.replaceAll("")+"\n";
-				description += itemInfo.replaceFirst("^"+packageItem.getName()+":[ ]?", "")+"\n";
+				description += itemInfo.replaceFirst(descriptionRegexp, "")+"\n"; // getName(true):: el true es para retornar el nombre escapeado
 			}
 			
 //			System.out.println(scannerLinea.next());
@@ -351,6 +357,12 @@ public class JSlackpkgPackageManager implements PackageManager
 				 continue;
 			 }
 			 
+			 { //Copio la descripcion y si no esta en esta lista no se muestra nada porque es viejo
+				 if (!isSlackwareCurrentPackage(packageItem))
+					 continue;
+				 packageItem.setDescription( getPackageDescription(packageItem) );
+			 }
+			 
 			 String actionGroup = matcher.group(3);
 			 String extraGroup = matcher.group(4);
 			 
@@ -360,12 +372,6 @@ public class JSlackpkgPackageManager implements PackageManager
 				 actionGroup = actionGroup.trim();
 			 if (extraGroup != null)
 				 extraGroup = extraGroup.trim();
-			 
-			 { //Copio la descripcion y si no esta en esta lista no se muestra nada porque es viejo
-				 if (!isSlackwareCurrentPackage(packageItem))
-					 continue;
-				 packageItem.setDescription( getPackageDescription(packageItem) );
-			 }
 			 
 			 StatusBar.getInstance().increaseProgress();
 

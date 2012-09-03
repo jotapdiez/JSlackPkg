@@ -19,21 +19,45 @@ class PackageFileName
 	
 	public PackageFileName(String fileName)
 	{
+		boolean escaped = false;
 		fileName = fileName.replaceAll("\\.t.z", "");
+		if (fileName.indexOf('+')>-1)
+		{
+//			System.out.println(fileName+" - fileName.indexOf('+'): " + fileName.indexOf('+'));
+			fileName = escape(fileName);
+			escaped = true;
+		}
+		
 		Pattern pattern = Pattern.compile("^(.*)-(.*)-(.*)-(.*)$");
 		Matcher matcher = pattern.matcher(fileName);
 
 		if (matcher.find())
 		{
-			 setName(matcher.group(1).toCharArray());
-			 setVersion(matcher.group(2).toCharArray());
-			 setArch(matcher.group(3).toCharArray());
-			 setBuild(matcher.group(4).toCharArray());
+			String name = matcher.group(1);
+			if (escaped)
+				name = unescape(name);
+			setName( name.toCharArray() );
+			setVersion(matcher.group(2).toCharArray());
+			setArch(matcher.group(3).toCharArray());
+			setBuild(matcher.group(4).toCharArray());
 			 
-			 _fullName = fileName.toCharArray();
+			_fullName = fileName.toCharArray();
 		}
 //		else
 //			System.out.println("Invalida package filename: " + fileName);
+	}
+	
+	String escape(String name)
+	{
+//		System.out.println("escape: " + name);
+		return name.replaceAll("\\+", "\\\\+");
+	}
+	
+	private String unescape(String name)
+	{
+//		System.out.println("unescape: " + name);
+		return name.replaceAll("\\\\\\+", "#")
+				.replaceAll("#", "\\+");
 	}
 	
 	public String getFullName()

@@ -135,7 +135,16 @@ public class Package
 
 	public String getName()
 	{
-		return _pName.getName();
+		return getName(false);
+	}
+	
+	public String getName(boolean escaped)
+	{
+//		System.out.println("escaped: " + escaped);
+		String result = _pName.getName();
+		if (escaped)
+			result = _pName.escape(result);
+		return result;
 	}
 
 	public String getUncompressedSize()
