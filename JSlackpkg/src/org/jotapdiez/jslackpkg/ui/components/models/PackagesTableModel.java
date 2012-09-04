@@ -11,7 +11,14 @@ import javax.swing.table.DefaultTableModel;
 
 public class PackagesTableModel extends DefaultTableModel
 {
-	String[]						_columnNames	= new String[] { "S", "Nombre", "Tamano Instalado", "Version", "Build", "Ubicacion" };	// TODO: A archivo de lenguajes
+	public static String COLUMN_SELECT = "S"; // TODO: A archivo de lenguajes
+	public static String COLUMN_NAME = "Nombre"; // TODO: A archivo de lenguajes
+	public static String COLUMN_INSTALLED_SIZE = "Tamano Instalado"; // TODO: A archivo de lenguajes
+	public static String COLUMN_VERSION = "Version"; // TODO: A archivo de lenguajes
+	public static String COLUMN_BUILD = "Build"; // TODO: A archivo de lenguajes
+	public static String COLUMN_LOCATION = "Ubicacion"; // TODO: A archivo de lenguajes
+	
+	String[] _columnNames	= new String[] { COLUMN_SELECT, COLUMN_NAME, COLUMN_INSTALLED_SIZE, COLUMN_VERSION, COLUMN_BUILD, COLUMN_LOCATION };
 
 	private Map<Integer, Item>	_data			= null;
 
@@ -29,6 +36,9 @@ public class PackagesTableModel extends DefaultTableModel
 			this.selected = selected;
 			packageItem = pack;
 		}
+	}
+	
+	public PackagesTableModel() {
 	}
 	
 	@Override
@@ -50,12 +60,6 @@ public class PackagesTableModel extends DefaultTableModel
 			return 0;
 		
 		return _data.size();
-	}
-
-	@Override
-	public Class<?> getColumnClass(int columnIndex)
-	{
-		return String.class;
 	}
 
 	public void setData(List<Package> packages)
@@ -88,6 +92,12 @@ public class PackagesTableModel extends DefaultTableModel
 	}
 	
 	@Override
+	public Class<?> getColumnClass(int columnIndex)
+	{
+		return getValueAt(0, columnIndex).getClass();
+	}
+
+	@Override
 	public Object getValueAt(int row, int col)
 	{
 		if (_data == null)
@@ -109,7 +119,7 @@ public class PackagesTableModel extends DefaultTableModel
 					ret = item.packageItem.getName();
 					break;
 				case 2:
-					ret = item.packageItem.getUncompressedSize();
+					ret = Double.parseDouble(item.packageItem.getUncompressedSize());
 					break;
 				case 3:
 					ret = item.packageItem.getVersion();
@@ -144,11 +154,11 @@ public class PackagesTableModel extends DefaultTableModel
 		return _data.get(row).packageItem;
 	}
 	
-//	@Override
-//	public boolean isCellEditable(int row, int column)
-//	{
-//		return false;
-//	}
+	@Override
+	public boolean isCellEditable(int row, int column)
+	{
+		return (column<=0); // Solo la primera se puedde editar
+	}
 
 	private static final long	serialVersionUID	= -502859337667720942L;
 }

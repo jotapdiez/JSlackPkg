@@ -1,25 +1,27 @@
 package org.jotapdiez.jslackpkg.ui.components;
 
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-import javax.swing.JLabel;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
-import javax.swing.JTextField;
 import java.awt.BorderLayout;
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import org.jotapdiez.jslackpkg.core.entities.Package;
-import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
-import org.jotapdiez.jslackpkg.utils.ResourceMap;
-import javax.swing.JCheckBox;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+
+import org.jotapdiez.jslackpkg.core.entities.Package;
+import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
+import org.jotapdiez.jslackpkg.utils.Conversions;
+import org.jotapdiez.jslackpkg.utils.ResourceMap;
+
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class PackageInformation extends JPanel
 {
@@ -38,15 +40,6 @@ public class PackageInformation extends JPanel
 	private PackageManager				packageManager		= null;
 
 	private Package						_packageItem		= null;
-
-//	private static PackageInformation	_instance			= null;
-//
-//	public static PackageInformation getInstance(PackageManager packageManager)
-//	{
-//		if (_instance == null)
-//			_instance = new PackageInformation(packageManager);
-//		return _instance;
-//	}
 
 	public PackageInformation(PackageManager packageManager)
 	{
@@ -195,8 +188,15 @@ public class PackageInformation extends JPanel
 	{
 		txtName.setText(_packageItem.getName());
 		txtVersion.setText(_packageItem.getVersion());
-		txtInstalledSize.setText(_packageItem.getUncompressedSize());
-		txtSize.setText(_packageItem.getCompressedSize());
+		
+		{
+			double val = Double.parseDouble(_packageItem.getUncompressedSize());
+			txtInstalledSize.setText(Conversions.parseSize(val));
+		}
+		{
+			double val = Double.parseDouble(_packageItem.getCompressedSize());
+			txtSize.setText(Conversions.parseSize(val));
+		}
 		txtState.setText(_packageItem.getState().toString());
 		txtDescription.setText(_packageItem.getDescription());
 

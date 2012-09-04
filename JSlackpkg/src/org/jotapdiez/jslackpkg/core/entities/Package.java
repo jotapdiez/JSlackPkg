@@ -1,8 +1,6 @@
 package org.jotapdiez.jslackpkg.core.entities;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
-
 
 public class Package
 {
@@ -81,7 +79,7 @@ public class Package
 		return "";
 	}
 
-	public void setSizeUncompressed(String size)
+	public void setUncompressedSize(String size)
 	{
 		String originalSize = size;
 
@@ -95,7 +93,7 @@ public class Package
 			_sizeUncompressed = (_sizeUncompressed * 1024) * 1024;
 	}
 
-	public void setSizeCompressed(String size)
+	public void setCompressedSize(String size)
 	{
 		String originalSize = size;
 
@@ -149,34 +147,19 @@ public class Package
 
 	public String getUncompressedSize()
 	{
-		return parseSize(_sizeUncompressed);
+		return String.valueOf(_sizeUncompressed);
+//		return parseSize(_sizeUncompressed);
 	}
 
 	public String getCompressedSize()
 	{
-		return parseSize(_sizeCompressed);
+//		return parseSize(_sizeCompressed);
+		return String.valueOf(_sizeCompressed);
 	}
 	
 	public String getVersion() {
 		return _pName.getVersion();
 	}
-	
-	private String parseSize(double sizeToParse)
-	{
-		char sizeType = 'K';
-		double size = sizeToParse;
-		if (size > 1024)
-		{
-			size = size / 1024;
-			sizeType = 'M';
-			if (size > 1024)
-			{
-				size = size / 1024;
-				sizeType = 'G';
-			}
-		}
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		return String.valueOf(twoDForm.format(size)) + String.valueOf(sizeType);	}
 	
 	public String getBuild()
 	{

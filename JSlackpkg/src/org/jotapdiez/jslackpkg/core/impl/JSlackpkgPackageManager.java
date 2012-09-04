@@ -214,7 +214,6 @@ public class JSlackpkgPackageManager implements PackageManager
 			if (itemInfo.indexOf("FILE LIST:") > -1)
 				break;
 			
-			
 			if (itemInfo.startsWith("NAME:"))
 			{
 				if (description != null && !description.equals(""))
@@ -235,16 +234,16 @@ public class JSlackpkgPackageManager implements PackageManager
 				packageItem.setFileName(fileName);
 				descriptionRegexp = descriptionRegexp.replace("#NAME#", packageItem.getName(true));
 				
-				System.out.println("descriptionRegexp: " + descriptionRegexp);
+//				System.out.println("descriptionRegexp: " + descriptionRegexp);
 			}else if (itemInfo.indexOf("LOCATION:") > -1)
 				packageItem.setLocation(itemInfo.replace("LOCATION:", "").trim());
 			else if (itemInfo.indexOf("SIZE") > -1)
 			{
 				itemInfo = itemInfo.replace("SIZE", "").replace(":", "").replace("(", "").replace(")", "");
 				if (itemInfo.indexOf("uncomp") >-1 || itemInfo.indexOf("UNCOMP") >-1)
-					packageItem.setSizeUncompressed(itemInfo.replace("UNCOMPRESSED", "").trim());
+					packageItem.setUncompressedSize(itemInfo.replace("UNCOMPRESSED", "").trim());
 				else // if (itemInfo.indexOf("comp") || itemInfo.indexOf("COMP"))
-					packageItem.setSizeCompressed(itemInfo.replace("COMPRESSED", "").trim());
+					packageItem.setCompressedSize(itemInfo.replace("COMPRESSED", "").trim());
 			}else if (itemInfo.startsWith("DESCRIPTION") )
 			{
 				isInDescription = true;
@@ -358,9 +357,15 @@ public class JSlackpkgPackageManager implements PackageManager
 			 }
 			 
 			 { //Copio la descripcion y si no esta en esta lista no se muestra nada porque es viejo
-				 if (!isSlackwareCurrentPackage(packageItem))
+				 Package packageItemTmp = getPackage(packageItem.getFullName());
+				 
+				 if (packageItemTmp == null || !packageItemTmp.equalsExact(packageItem))
+//				 if (!isSlackwareCurrentPackage(packageItem))
 					 continue;
-				 packageItem.setDescription( getPackageDescription(packageItem) );
+				 
+				 packageItem.setDescription( packageItemTmp.getDescription() );
+				 packageItem.setCompressedSize(packageItemTmp.getCompressedSize());
+				 packageItem.setUncompressedSize(packageItemTmp.getUncompressedSize());
 			 }
 			 
 			 String actionGroup = matcher.group(3);
@@ -375,15 +380,6 @@ public class JSlackpkgPackageManager implements PackageManager
 			 
 			 StatusBar.getInstance().increaseProgress();
 
-//			 {
-//				 Package packageItemTmp = installedPackages.get(packageItem.getName());
-//				 if ( packageItemTmp != null && packageItemTmp.equalsExact(packageItem))
-//				 {
-//					 System.out.println(packageItem.getFullName() + " ya esta instalado"); //TODO: A archivo de lenguajes
-//					 continue;
-//				 }
-//			 }
-//			 
 			 packageItem.setLocation(locationGroup);
 			 
 			 if (actionGroup.equals("Upgraded"))

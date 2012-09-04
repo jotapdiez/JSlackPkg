@@ -13,6 +13,8 @@ import java.util.prefs.Preferences;
 
 import org.jotapdiez.jslackpkg.JSlackpkg;
 
+import sun.misc.IOUtils;
+
 public class SettingsManager
 {
 	public enum Section
@@ -59,8 +61,24 @@ public class SettingsManager
 	}
 	
 	private SettingsManager() {
-		String path = getClass().getResource("/resources/config").getPath();
-		load(path);
+		String homeUserPath = System.getProperty("user.home");
+		
+		File jslackpkgDir = new File(homeUserPath, ".jslackpkg");
+		if (!jslackpkgDir.exists())
+			jslackpkgDir.mkdir();
+		
+		System.out.println("jslackpkgDir: " + jslackpkgDir.getAbsolutePath());
+		
+		File userConfigFile = new File(jslackpkgDir, "config.xml");
+		if (!userConfigFile.exists())
+		{
+			System.out.println("Escribiendo archivo de configuracion en el usuario.");
+			saveDefaults(jslackpkgDir.getAbsolutePath());
+		}
+		System.out.println("userConfigFile: " + userConfigFile.getAbsolutePath());
+		
+//		String path = getClass().getResource("/resources/config").getPath();
+		load(jslackpkgDir.getAbsolutePath());
 	}
 	
 	public void load(String parentPath)
@@ -68,7 +86,7 @@ public class SettingsManager
 		// Create an input stream on a file
 		InputStream is = null;
 		try {
-		    is = new BufferedInputStream(new FileInputStream(parentPath+"/default.xml"));
+		    is = new BufferedInputStream(new FileInputStream(parentPath+"/config.xml"));
 		} catch (FileNotFoundException e) {
 		}
 
@@ -190,17 +208,13 @@ public class SettingsManager
 		}
 		
 		try {
-			System.out.println(new File(parentPath+"/default.xml").getAbsolutePath());
-			prefs.exportSubtree(new FileOutputStream(parentPath+"/default.xml"));
+			System.out.println(new File(parentPath+"/config.xml").getAbsolutePath());
+			prefs.exportSubtree(new FileOutputStream(parentPath+"/config.xml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static void main(String[] args) {
-		SettingsManager.saveDefaults(".");
 	}
 }
 

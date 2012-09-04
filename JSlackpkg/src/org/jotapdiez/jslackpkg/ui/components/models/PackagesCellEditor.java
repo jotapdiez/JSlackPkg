@@ -44,5 +44,6 @@ public class PackagesCellEditor extends AbstractCellEditor implements TableCellE
 //		System.err.println("ActionListener:ActionCommand: "+e.getActionCommand());
 		fireEditingStopped();
 	}
+	
 	private static final long serialVersionUID = 4346422845510702274L;
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -20,44 +19,32 @@ public class PackagesTable extends JTable
 	
 	public PackagesTable()
 	{
-		setDefaultEditor(String.class, new PackagesCellEditor());
-		setDefaultRenderer(String.class, new PackagesListCellRender());
+		setAutoCreateColumnsFromModel(true);
+		
+		setDefaultRenderer(Double.class, new PackagesTableCellRenderer());
+		setDefaultRenderer(String.class, new PackagesTableCellRenderer());
+		setCellEditor(new PackagesCellEditor());
+		
 		setCellSelectionEnabled(false);
 		setColumnSelectionAllowed(false);
 		setDragEnabled(false);
 		
 		getTableHeader().setReorderingAllowed(false);
 		
-		sorter.setSortsOnUpdates(true);
 		setRowSorter(sorter);
 	}
 	
 	public void setData(List<Package> data)
 	{
-//		if (model == null)
-			model = new PackagesTableModel();
+		model = new PackagesTableModel();
 		
 		model.setData(data);
 		sorter.setModel(model);
 		setModel(model);
-		setAutoCreateColumnsFromModel(true);
 
 		packColumns();
-		
-//		getTableHeader().getColumnModel().getColumn(1).getCellEditor();
 	}
 
-//	public List<Package> getData()
-//	{
-//		return model.getData();
-//	}
-	
-	public void cleanData()
-	{
-		model = new PackagesTableModel();
-		setModel(new DefaultTableModel());
-	}
-	
 	public void packColumns()
 	{
 		for (int c = 0; c < this.getColumnCount(); c++)
@@ -112,42 +99,5 @@ public class PackagesTable extends JTable
 		sorter.setRowFilter(filter);
 	}
 	
-//	TODO: Implementar
-//	private void configureRowSorter()
-//	{
-//		final String regexpRemoveNonNumbers = "[^0-9]*";
-//		
-//		sorter.setSortsOnUpdates(true);
-//		//Harcoding columna Estado
-//		sorter.setComparator(2, new Comparator<STATE>()
-//		{
-//			public int compare(STATE o1, STATE o2)
-//			{
-//				return o1.compareTo(o2);
-//			}
-//		});
-//		
-//		//Harcoding columna version
-//		sorter.setComparator(3, new Comparator<String>()
-//		{
-//			public int compare(String o1, String o2)
-//			{
-//				Long o1l = Long.valueOf(o1.replaceAll(regexpRemoveNonNumbers, ""));
-//				Long o2l = Long.valueOf(o2.replaceAll(regexpRemoveNonNumbers, ""));
-//				return o1l.compareTo(o2l);
-//			}
-//		});
-//		//Harcoding columna build
-//		sorter.setComparator(3, new Comparator<String>()
-//		{
-//			public int compare(String o1, String o2)
-//			{
-//				Long o1l = Long.valueOf(o1.replaceAll(regexpRemoveNonNumbers, ""));
-//				Long o2l = Long.valueOf(o2.replaceAll(regexpRemoveNonNumbers, ""));
-//				return o1l.compareTo(o2l);
-//			}
-//		});
-//	}
-
 	private static final long	serialVersionUID	= 1285320561554247588L;
 }
