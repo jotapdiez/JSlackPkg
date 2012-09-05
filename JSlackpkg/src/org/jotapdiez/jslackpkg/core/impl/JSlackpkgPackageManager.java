@@ -26,6 +26,7 @@ import org.jotapdiez.jslackpkg.core.entities.Package.STATE;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
 import org.jotapdiez.jslackpkg.core.settings.SettingsManager;
 import org.jotapdiez.jslackpkg.ui.components.custom.StatusBar;
+import org.jotapdiez.jslackpkg.utils.ResourceMap;
 
 public class JSlackpkgPackageManager implements PackageManager
 {
@@ -128,7 +129,6 @@ public class JSlackpkgPackageManager implements PackageManager
 	{
 		if (packagesInfo == null)
 		{
-			StatusBar.getInstance().setFocusComponentText("Descargando PACKAGES.TXT"); //TODO: A archivo de lenguajes
 			packagesInfo = downloadFile("PACKAGES.TXT").toCharArray();
 			fullPackages.clear();
 		}
@@ -306,7 +306,7 @@ public class JSlackpkgPackageManager implements PackageManager
 			result = null;
 			dateScanner.useDelimiter("\\+--------------------------\\+");
 			
-			StatusBar.getInstance().setFocusComponentText("Interpretando ChangeLog.txt"); //TODO: A archivo de lenguajes
+			StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.parsing_file.text").replaceFirst("%FILE%", "ChangeLog.txt"));
 			StatusBar.getInstance().resetProgress();
 
 			while (dateScanner.hasNext())
@@ -320,9 +320,9 @@ public class JSlackpkgPackageManager implements PackageManager
 			}
 			
 			String finalProgressMessage = "";
-			finalProgressMessage += upgradedPackages.size()+" actualizacion/es"; //TODO: A archivo de lenguajes
-			finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + newPackages.size() + " nuevo/s"; //TODO: A archivo de lenguajes
-			finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + removedPackages.size() + " eliminado/s"; //TODO: A archivo de lenguajes
+			finalProgressMessage += ResourceMap.getInstance().getString("statusbar.info.update_cant.text").replaceFirst("%CANT%", String.valueOf(upgradedPackages.size()));
+			finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + ResourceMap.getInstance().getString("statusbar.info.new_cant.text").replaceFirst("%CANT%", String.valueOf(newPackages.size()));
+			finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + ResourceMap.getInstance().getString("statusbar.info.removed_cant.text").replaceFirst("%CANT%", String.valueOf(removedPackages.size()));
 		 
 			StatusBar.getInstance().setFocusComponentText(finalProgressMessage);
 			StatusBar.getInstance().resetProgress();
@@ -672,7 +672,7 @@ public class JSlackpkgPackageManager implements PackageManager
 	private String downloadPackage(String remoteFile, String fileName)
 	{
 		try {
-			StatusBar.getInstance().setFocusComponentText("Descargando paquete "+fileName); //TODO: A archivo de lenguajes
+			StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.downloading.text").replaceFirst("%FILE%", fileName));
 //			String state = "Descargando: ";
 //			infoPanel.setState(state);
 //			infoPanel.updateProgress(0);
@@ -746,7 +746,7 @@ public class JSlackpkgPackageManager implements PackageManager
 	 */
 	public String downloadFile(String file) {
 		try {
-			StatusBar.getInstance().setFocusComponentText("Descargando "+file); //TODO: A archivo de lenguajes
+			StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.downloading.text").replaceFirst("%FILE%", file));
 
 			URL mirrorContext = new URL(settingsManager.getOption(SettingsManager.Section.REPO, "mirror"));
 			URL mirrorFile = new URL(mirrorContext, file);

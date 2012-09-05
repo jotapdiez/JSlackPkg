@@ -30,12 +30,12 @@ public class MainUI extends JFrame
     private final StatusBar sggProgressBar = StatusBar.getInstance();
 
 	private final JToolBar toolBar = new JToolBar();
-	private final JButton btnInstalled = new JButton("Installed", ResourceMap.installedIcon); //TODO: A archivo de lenguajes
-	private final JButton btnUpdate = new JButton("Update", ResourceMap.updateIcon); //TODO: A archivo de lenguajes
-	private final JButton btnClean = new JButton("Clean", ResourceMap.cleanIcon); //TODO: A archivo de lenguajes
-	private final JButton btnUpgradeall = new JButton("Upgrade", ResourceMap.upgradeIcon); //TODO: A archivo de lenguajes
-	private final JButton btnInstallnew = new JButton("Install New", ResourceMap.installIcon); //TODO: A archivo de lenguajes
-	private final JButton btnSettings = new JButton("Settings", ResourceMap.settingsIcon); //TODO: A archivo de lenguajes
+	private final JButton btnInstalled = new JButton(ResourceMap.getInstance().getString("mainui.toolbar.installed.text"), ResourceMap.installedIcon);
+	private final JButton btnUpdate = new JButton(ResourceMap.getInstance().getString("mainui.toolbar.update.text"), ResourceMap.updateIcon);
+	private final JButton btnUpgradeall = new JButton(ResourceMap.getInstance().getString("mainui.toolbar.upgrade.text"), ResourceMap.upgradeIcon);
+	private final JButton btnInstallnew = new JButton(ResourceMap.getInstance().getString("mainui.toolbar.new.text"), ResourceMap.installIcon);
+	private final JButton btnClean = new JButton(ResourceMap.getInstance().getString("mainui.toolbar.clean.text"), ResourceMap.cleanIcon);
+	private final JButton btnSettings = new JButton(ResourceMap.getInstance().getString("mainui.toolbar.settings.text"), ResourceMap.settingsIcon);
 
 	private final SplitPane splitPane = new SplitPane(false);
     
@@ -121,8 +121,8 @@ public class MainUI extends JFrame
     	}
     	
     	getContentPane().add(tabbedPane, BorderLayout.CENTER);
-    	tabbedPane.add("Packages", splitPane); //TODO: A archivo de lenguajes
-    	tabbedPane.add("Settings", new Settings()); //TODO: A archivo de lenguajes
+    	tabbedPane.add(ResourceMap.getInstance().getString("mainui.tabs.packages.text"), splitPane);
+    	tabbedPane.add(ResourceMap.getInstance().getString("mainui.tabs.settings.text"), new Settings());
 //    	splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
     	
     	packageInformation = new PackageInformation(packageManager);
@@ -170,7 +170,7 @@ public class MainUI extends JFrame
         	menuArchivo.setMnemonic('A');
 	        menuBar.add(menuArchivo);
 	        
-        	archivoSalir.setText( ResourceMap.getInstance().getString("mainui.menu.salir.text") );
+        	archivoSalir.setText( ResourceMap.getInstance().getString("mainui.menu.archivo.salir.text") );
         	archivoSalir.setName("menuSalir");
         	archivoSalir.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -181,12 +181,12 @@ public class MainUI extends JFrame
         }
         
         { // Menu Acciones
-	        menuAcciones.setText("Acciones"); //TODO: A archivo de lenguajes
+	        menuAcciones.setText(ResourceMap.getInstance().getString("mainui.menu.actions.text"));
 	        menuAcciones.setName("menuAcciones");
 	        menuAcciones.setMnemonic('C');
 	        menuBar.add(menuAcciones);
 
-	        accionesInstalled.setText("Installed"); //TODO: A archivo de lenguajes
+	        accionesInstalled.setText( ResourceMap.getInstance().getString("mainui.menu.actions.installed.text") );
 	        accionesInstalled.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
         			showInstalledPackages();
@@ -195,7 +195,7 @@ public class MainUI extends JFrame
         	menuAcciones.add(accionesInstalled);
         	menuAcciones.add(new JSeparator());
 
-        	accionesUpdate.setText("Update"); //TODO: A archivo de lenguajes
+        	accionesUpdate.setText( ResourceMap.getInstance().getString("mainui.menu.actions.update.text") );
         	accionesUpdate.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
         			doUpdate();
@@ -204,14 +204,14 @@ public class MainUI extends JFrame
         	menuAcciones.add(accionesUpdate);
         	menuAcciones.add(new JSeparator());
         	
-        	accionesUpgrade.setText("Upgrade"); //TODO: A archivo de lenguajes
+        	accionesUpgrade.setText( ResourceMap.getInstance().getString("mainui.menu.actions.upgrade.text") );
         	accionesUpgrade.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
         			doUpgrade();
         		}
 			});
         	menuAcciones.add(accionesUpgrade);
-        	accionesNew.setText("Install"); //TODO: A archivo de lenguajes
+        	accionesNew.setText( ResourceMap.getInstance().getString("mainui.menu.actions.new.text") );
         	accionesNew.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
         			doNew();
@@ -220,7 +220,7 @@ public class MainUI extends JFrame
         	menuAcciones.add(accionesNew);
         	menuAcciones.add(new JSeparator());
         	
-        	accionesClean.setText("Clean"); //TODO: A archivo de lenguajes
+        	accionesClean.setText( ResourceMap.getInstance().getString("mainui.menu.actions.clean.text") );
         	accionesClean.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
         			doClean();
@@ -230,29 +230,29 @@ public class MainUI extends JFrame
         }
         
         { // Menu Opciones
-        	menuOpciones.setText("Opciones"); //TODO: A archivo de lenguajes?
+        	menuOpciones.setText(ResourceMap.getInstance().getString("mainui.menu.options.text"));
         	menuOpciones.setName("menuOpciones");
         	menuOpciones.setMnemonic('O');
 	        menuBar.add(menuOpciones);
 	        
 	        menuOpciones.add(new JSeparator());
-	        opcionesConfig.setText( "Configuracion" ); //TODO: A archivo de lenguajes
+	        opcionesConfig.setText(ResourceMap.getInstance().getString("mainui.menu.options.settings.text"));
 	        opcionesConfig.setName("opcionesConfig");
         	menuOpciones.add(opcionesConfig);
         }
         
         { // Menu Ayuda
-        	menuAyuda.setText("?"); //TODO: A archivo de lenguajes?
+        	menuAyuda.setText(ResourceMap.getInstance().getString("mainui.menu.help.text"));
         	menuAyuda.setName("menuAyudaSimbol");
         	menuAyuda.setMnemonic('H');
 	        menuBar.add(menuAyuda);
 	        
-	        ayudaAyuda.setText( "Ayuda" ); //TODO: A archivo de lenguajes
+	        ayudaAyuda.setText(ResourceMap.getInstance().getString("mainui.menu.help.help.text"));
 	        ayudaAyuda.setName("ayudaAyuda");
         	menuAyuda.add(ayudaAyuda);
         	menuAyuda.add(new JSeparator());
         	
-        	ayudaAcercaDe.setText( "Acerca De..." ); //TODO: A archivo de lenguajes
+        	ayudaAcercaDe.setText(ResourceMap.getInstance().getString("mainui.menu.help.about.text"));
         	ayudaAcercaDe.setName("ayudaAcercaDe");
         	menuAyuda.add(ayudaAcercaDe);
         }

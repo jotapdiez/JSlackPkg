@@ -40,8 +40,19 @@ public class ResourceMap
 
 	public static ResourceMap getInstance()
 	{
+		return getInstance(null);
+	}
+
+	public static ResourceMap getInstance(String fileName)
+	{
 		if (instance == null)
-			instance = new ResourceMap();
+		{
+			System.out.println("fileName: " + fileName);
+			if (fileName != null)
+				instance = new ResourceMap(fileName);
+			else
+				instance = new ResourceMap();
+		}
 		return instance;
 	}
 

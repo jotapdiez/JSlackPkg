@@ -25,6 +25,7 @@ import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
 import org.jotapdiez.jslackpkg.ui.MainUI;
 import org.jotapdiez.jslackpkg.ui.components.models.PackagesTable;
 import org.jotapdiez.jslackpkg.ui.components.models.PackagesTableModel;
+import org.jotapdiez.jslackpkg.utils.ResourceMap;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -53,7 +54,7 @@ public class PackagesList extends JPanel
 		add(splitPane);
 
 		JPanel filterPanel = new JPanel();
-		filterPanel.setBorder(new TitledBorder(null, "Filtrar", TitledBorder.LEADING, TitledBorder.TOP, null, null)); // TODO: A archivo de lenguajes
+		filterPanel.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packagesList.button.filter.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		filterPanel.setMaximumSize(filterPanel.getMinimumSize());
 		splitPane.setTopComponent(filterPanel);
 		filterPanel.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("280px:grow"), ColumnSpec.decode("114px"), }, new RowSpec[] { FormFactory.LINE_GAP_ROWSPEC, RowSpec.decode("19px"), }));
@@ -81,7 +82,7 @@ public class PackagesList extends JPanel
 		filterPanel.add(txtFilter, "1, 2, fill, top");
 		txtFilter.setColumns(10);
 
-		JButton btnFiltrar = new JButton("Filtrar"); // TODO: A archivo de lenguajes
+		JButton btnFiltrar = new JButton(ResourceMap.getInstance().getString("packagesList.button.filter.text"));
 		btnFiltrar.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -130,29 +131,29 @@ public class PackagesList extends JPanel
 		panel.add(panelButtonsActions, BorderLayout.SOUTH);
 		
 		JPanel panelAcciones = new JPanel();
-		panelAcciones.setBorder(new TitledBorder(null, "Acciones", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelAcciones.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packagesList.panel.actions.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelButtonsActions.add(panelAcciones);
 		
-		JButton btnInstallSelected = new JButton("Instalar");
+		JButton btnInstallSelected = new JButton(ResourceMap.getInstance().getString("packagesList.button.install.text"));
 		panelAcciones.add(btnInstallSelected);
 		
-		JButton btnActualizar = new JButton("Actualizar");
+		JButton btnActualizar = new JButton(ResourceMap.getInstance().getString("packagesList.button.upgrade.text"));
 		panelAcciones.add(btnActualizar);
 		
-		JButton btnEliminar = new JButton("Eliminar");
+		JButton btnEliminar = new JButton(ResourceMap.getInstance().getString("packagesList.button.remove.text"));
 		panelAcciones.add(btnEliminar);
 		
 		JPanel panelBlackList = new JPanel();
-		panelBlackList.setBorder(new TitledBorder(null, "BlackList", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelBlackList.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packagesList.panel.blacklist.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelButtonsActions.add(panelBlackList);
 		
-		JCheckBox chckbxShowHideBlacklist = new JCheckBox("Mostrar/Ocultar");
+		JCheckBox chckbxShowHideBlacklist = new JCheckBox(ResourceMap.getInstance().getString("packagesList.ckeckbox.showHide.text"));
 		panelBlackList.add(chckbxShowHideBlacklist);
 		
-		JButton btnAgregar = new JButton("Agregar");
+		JButton btnAgregar = new JButton(ResourceMap.getInstance().getString("packagesList.button.addBlackList.text"));
 		panelBlackList.add(btnAgregar);
 		
-		JButton btnEliminar_1 = new JButton("Eliminar");
+		JButton btnEliminar_1 = new JButton(ResourceMap.getInstance().getString("packagesList.button.removeBlackList.text"));
 		panelBlackList.add(btnEliminar_1);
 		btnInstallSelected.addActionListener(new ActionListener() {
 			@Override
@@ -179,7 +180,7 @@ public class PackagesList extends JPanel
 			return;
 		
 		table.setData(packages);
-		lblPackageCount.setText("Cantidad de paquetes: "+ packages.size());  // TODO: A archivo de lenguajes
+		lblPackageCount.setText(ResourceMap.getInstance().getString("packagesList.info.packagesSize.text") + packages.size());
 	}
 
 	private void resetFilter()
