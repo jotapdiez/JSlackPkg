@@ -157,10 +157,34 @@ public class PackagesList extends JPanel
 		panelBlackList.add(btnEliminar_1);
 		btnInstallSelected.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				List<Package> list = ((PackagesTableModel) table.getModel()).getSelected();
-				for (Package item : list)
-					System.out.println("selected: "+item.getName());
+			public void actionPerformed(ActionEvent event) {
+				List<Package> list = table.getSelectedPackages();
+				if (list.size()>0)
+				{
+					System.out.println("SELECTED PACKAGES ===============");
+					for (Package item : list)
+						System.out.println("selected: "+item.getName());
+					System.out.println("===============");
+				}
+				
+//				int[] indexSelectedRow = table.getSelectedRows();
+//				
+//				if (indexSelectedRow.length>0)
+//					System.out.println("SELECTED PACKAGES ===============");
+//				for (int index : indexSelectedRow)
+//				{
+//					index = table.convertRowIndexToModel(index);
+//					Package selectedPackage = ((PackagesTableModel) table.getModel()).getValueAt(index);
+//					System.out.println(selectedPackage.getName());
+//				}
+//				System.out.println("===============");
+				
+//				
+//				Package selectedPackage = model.getValueAt(indexSelectedRow);
+//
+//				List<Package> list = ((PackagesTableModel) table.getModel()).getSelected();
+//				for (Package item : list)
+//					System.out.println("selected: "+item.getName());
 			}
 		});
 		

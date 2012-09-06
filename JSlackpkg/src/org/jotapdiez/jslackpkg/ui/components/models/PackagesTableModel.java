@@ -12,14 +12,13 @@ import javax.swing.table.DefaultTableModel;
 
 public class PackagesTableModel extends DefaultTableModel
 {
-	public static String COLUMN_SELECT = ResourceMap.getInstance().getString("packagesList.table.column.select.text");
-	public static String COLUMN_NAME = ResourceMap.getInstance().getString("packagesList.table.column.name.text");
+	public static String COLUMN_NAME           = ResourceMap.getInstance().getString("packagesList.table.column.name.text");
 	public static String COLUMN_INSTALLED_SIZE = ResourceMap.getInstance().getString("packagesList.table.column.installedSize.text");
-	public static String COLUMN_VERSION = ResourceMap.getInstance().getString("packagesList.table.column.version.text");
-	public static String COLUMN_BUILD = ResourceMap.getInstance().getString("packagesList.table.column.build.text");
-	public static String COLUMN_LOCATION = ResourceMap.getInstance().getString("packagesList.table.column.location.text");
+	public static String COLUMN_VERSION        = ResourceMap.getInstance().getString("packagesList.table.column.version.text");
+	public static String COLUMN_BUILD          = ResourceMap.getInstance().getString("packagesList.table.column.build.text");
+	public static String COLUMN_LOCATION       = ResourceMap.getInstance().getString("packagesList.table.column.location.text");
 	
-	String[] _columnNames	= new String[] { COLUMN_SELECT, COLUMN_NAME, COLUMN_INSTALLED_SIZE, COLUMN_VERSION, COLUMN_BUILD, COLUMN_LOCATION };
+	String[] _columnNames	= new String[] { COLUMN_NAME, COLUMN_INSTALLED_SIZE, COLUMN_VERSION, COLUMN_BUILD, COLUMN_LOCATION };
 
 	private Map<Integer, Item>	_data			= null;
 
@@ -81,17 +80,6 @@ public class PackagesTableModel extends DefaultTableModel
 		}
 	}
 
-	public List<Package> getSelected()
-	{
-		List<Package> result = new LinkedList<Package>();
-		for (Item item : _data.values())
-		{
-			if (item.selected)
-				result.add(item.packageItem);
-		}
-		return result;
-	}
-	
 	@Override
 	public Class<?> getColumnClass(int columnIndex)
 	{
@@ -114,21 +102,18 @@ public class PackagesTableModel extends DefaultTableModel
 		{
 			switch (col) {
 				case 0:
-					ret = item.selected;
-					break;
-				case 1:
 					ret = item.packageItem.getName();
 					break;
-				case 2:
+				case 1:
 					ret = Double.parseDouble(item.packageItem.getUncompressedSize());
 					break;
-				case 3:
+				case 2:
 					ret = item.packageItem.getVersion();
 					break;
-				case 4:
+				case 3:
 					ret = item.packageItem.getBuild();
 					break;
-				case 5:
+				case 4:
 					ret = item.packageItem.getLocation();
 					break;
 			}

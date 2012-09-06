@@ -1,6 +1,7 @@
 package org.jotapdiez.jslackpkg.ui.components.models;
 
 import java.awt.Component;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JTable;
@@ -21,11 +22,12 @@ public class PackagesTable extends JTable
 	{
 		setAutoCreateColumnsFromModel(true);
 		
-		setDefaultRenderer(Double.class, new PackagesTableCellRenderer());
-		setDefaultRenderer(String.class, new PackagesTableCellRenderer());
-		setCellEditor(new PackagesCellEditor());
+//		setDefaultRenderer(Boolean.class, new PackagesTableCellRenderer());
+//		setDefaultRenderer(Double.class, new PackagesTableCellRenderer());
+//		setDefaultRenderer(String.class, new PackagesTableCellRenderer());
+//		setCellEditor(new PackagesCellEditor());
 		
-		setCellSelectionEnabled(false);
+		setCellSelectionEnabled(true);
 		setColumnSelectionAllowed(false);
 		setDragEnabled(false);
 		
@@ -97,6 +99,20 @@ public class PackagesTable extends JTable
 			filter = RowFilter.regexFilter(text);
 
 		sorter.setRowFilter(filter);
+	}
+	
+	public List<Package> getSelectedPackages() {
+		List<Package> list = new LinkedList<Package>();
+		int[] indexSelectedRow = getSelectedRows();
+		
+		for (int index : indexSelectedRow)
+		{
+			index = convertRowIndexToModel(index);
+			Package selectedPackage = model.getValueAt(index);
+			list.add(selectedPackage);
+		}
+		
+		return list;
 	}
 	
 	private static final long	serialVersionUID	= 1285320561554247588L;
