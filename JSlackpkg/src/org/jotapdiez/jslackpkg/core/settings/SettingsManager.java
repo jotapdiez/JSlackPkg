@@ -14,8 +14,6 @@ import java.util.prefs.Preferences;
 import org.apache.log4j.Logger;
 import org.jotapdiez.jslackpkg.JSlackpkg;
 
-import sun.misc.IOUtils;
-
 public class SettingsManager
 {
 	public enum Section
@@ -49,14 +47,14 @@ public class SettingsManager
 		}
 	}
 	
-	private Logger logger = Logger.getLogger(getClass());
+	private Logger logger = Logger.getLogger(getClass().getCanonicalName());
 	
 	private static Class<JSlackpkg> packageForNode = JSlackpkg.class;
 	private Preferences prefs = null;
 	private Preferences actualNode = null;
-	private static SettingsManager _instance = null;
-	
 	private File jslackpkgDir = null;
+	
+	private static SettingsManager _instance = null;
 	
 	public static SettingsManager getInstance()
 	{
@@ -82,7 +80,7 @@ public class SettingsManager
 		File userConfigFile = new File(jslackpkgDir, "config.xml");
 		if (!userConfigFile.exists())
 		{
-			logger.info("Escribiendo archivo de configuracion en el usuario en " + userConfigFile.getAbsolutePath());
+			logger.info("Creando archivo de configuracion del usuario en " + userConfigFile.getAbsolutePath());
 			saveDefaults(getWorkingDir());
 		}
 		

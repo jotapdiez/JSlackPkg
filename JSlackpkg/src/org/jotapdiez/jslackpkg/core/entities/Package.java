@@ -30,15 +30,16 @@ public class Package
 		}
 	}
 	
-	PackageFileName        _pName = null;
+	private PackageFileName _pName            = null;
 	
-	private char[]			_location			= null;
-	private char[]			_fileName			= null;
-	private double			_sizeUncompressed	= 0;
-	private double			_sizeCompressed		= 0;
-	private char[]			_description		= null;
-
-	private STATE			_state				= STATE.UNKNOWN;
+	private char[]			_location		  = null;
+	private char[]			_fileName		  = null;
+	private double			_sizeUncompressed = 0;
+	private double			_sizeCompressed	  = 0;
+	private char[]			_description	  = null;
+	private boolean         isInBlackList     = false;
+	
+	private STATE			_state			  = STATE.UNKNOWN;
 
 	public void setState(STATE state)
 	{
@@ -164,6 +165,16 @@ public class Package
 	public String getBuild()
 	{
 		return _pName.getBuild();
+	}
+
+	public void setIsInBlackList(boolean is)
+	{
+		isInBlackList = is;
+	}
+	
+	public boolean isInBlackList()
+	{
+		return isInBlackList;
 	}
 	
 	@Override

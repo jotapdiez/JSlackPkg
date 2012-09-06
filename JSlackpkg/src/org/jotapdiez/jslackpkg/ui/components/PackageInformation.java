@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import org.jotapdiez.jslackpkg.core.blacklist.BlackListManager;
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
 import org.jotapdiez.jslackpkg.utils.Conversions;
@@ -154,33 +155,83 @@ public class PackageInformation extends JPanel
 			btnInstall.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					/*boolean succesful = */packageManager.install(_packageItem);
+					doInstall(_packageItem);
 				}
 			});
 			btnUninstall.setEnabled(false);
 			btnUninstall.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					/*boolean succesful = */packageManager.remove(_packageItem);
+					doRemove(_packageItem);
 				}
 			});
 			btnBlackListAdd.setEnabled(false);
-			btnBlackListRemove.setEnabled(false);
+			btnBlackListAdd.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					doBlackListAdd();
+				}
+			});
 			blackListPanel.add(btnBlackListAdd, "1, 3");
+			
+			
+			btnBlackListRemove.setEnabled(false);
+			btnBlackListRemove.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					doBlackListRemove();
+				}
+			});
 			blackListPanel.add(btnBlackListRemove, "1, 5, fill, center");
 		}
 	}
 
-	public void setPackage(String packageFileName)
+	private void doBlackListAdd() {
+		if (_packageItem == null)
+			return;
+		
+		BlackListManager.getInstance().add(_packageItem);
+		updateButtons();
+	}
+	
+	private void doBlackListRemove() {
+		if (_packageItem == null)
+			return;
+		
+		BlackListManager.getInstance().remove(_packageItem);
+		updateButtons();
+	}
+	
+	private void doRemove(Package packageItem)
 	{
-		Package packageItem = packageManager.getPackage(packageFileName);
-		if (packageItem != null)
-			setPackage(packageItem);
+		if (packageItem == null)
+			return;
+		
+		boolean succesful = packageManager.remove(packageItem);
+		if (succesful)
+			setPackage(null);
 	}
 
+	private void doInstall(Package packageItem)
+	{
+		if (packageItem == null)
+			return;
+		
+		boolean succesful = packageManager.install(packageItem);
+		if (succesful)
+			setPackage(packageItem);
+	}
+	
 	public void setPackage(Package packageItem)
 	{
 		_packageItem = packageItem;
+		
+		if (_packageItem ==null)
+		{
+			cleanPackage();
+			return;
+		}
+		
 		mapPackage();
 	}
 
@@ -203,12 +254,32 @@ public class PackageInformation extends JPanel
 		updateButtons();
 	}
 
+	private void cleanPackage() {
+		txtName.setText("");
+		txtVersion.setText("");
+		
+		txtInstalledSize.setText("");
+		txtSize.setText("");
+		txtState.setText("");
+		txtDescription.setText("");
+
+		btnInstall.setEnabled(false);
+		btnUninstall.setEnabled(false);
+		
+		btnBlackListAdd.setEnabled(false);
+		btnBlackListRemove.setEnabled(false);
+	}
+	
 	private void updateButtons()
 	{
 		boolean installed = _packageItem.getState().equals(Package.STATE.INSTALLED);
 		
 		btnInstall.setEnabled(!installed);
 		btnUninstall.setEnabled(installed);
+		
+		boolean isInBlackList = _packageItem.isInBlackList();
+		btnBlackListAdd.setEnabled(!isInBlackList);
+		btnBlackListRemove.setEnabled(isInBlackList);
 	}
 
 	private static final long	serialVersionUID	= 7546213147519598392L;

@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.jotapdiez.jslackpkg.core.blacklist.BlackListManager;
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.entities.Package.STATE;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
@@ -31,7 +32,7 @@ import org.jotapdiez.jslackpkg.utils.ResourceMap;
 
 public class JSlackpkgPackageManager implements PackageManager
 {
-	Logger logger = Logger.getLogger(getClass());
+	Logger logger = Logger.getLogger(getClass().getCanonicalName());
 	
 	private final String INSTALLED_PACKAGES_PATH = "/var/log/packages/";
 
@@ -70,6 +71,7 @@ public class JSlackpkgPackageManager implements PackageManager
 			{
 				Package packageItem = list.get(0);
 				packageItem.setState(Package.STATE.INSTALLED);
+				packageItem.setIsInBlackList( BlackListManager.getInstance().isInBlackList(packageItem) );
 				installedPackages.put(packageItem.getName(), packageItem);
 			}
 		}
@@ -218,9 +220,19 @@ public class JSlackpkgPackageManager implements PackageManager
 				
 				String fileName = itemInfo.replace("NAME:", "").trim(); 
 				if (fileName.equals(""))
+				{
+					logger.debug("parsePackageInformation no package FileName" + itemInfo);
+					packageItem = null;
 					continue;
+				}
 				
 				packageItem.setFileName(fileName);
+				if (packageItem.getName() == null || packageItem.getName().equals(""))
+				{
+					logger.debug("parsePackageInformation invalid packageItem" + fileName);
+					packageItem = null;
+					continue;
+				}
 				descriptionRegexp = descriptionRegexp.replace("#NAME#", packageItem.getName(true));
 				
 //				System.out.println("descriptionRegexp: " + descriptionRegexp);
@@ -383,15 +395,15 @@ public class JSlackpkgPackageManager implements PackageManager
 			 {
 				 packageItem.setState(Package.STATE.UNKNOWN);
 				 //TODO: Hacer que?
-				 logger.debug("ActionGroup Reverted (Sin uso) - Paquete: " + packageItem.getFileName());
+				 logger.info("ActionGroup Reverted (Sin uso) - Paquete: " + packageItem.getFileName());
 			 }else
 			 {
 				 packageItem.setState(Package.STATE.UNKNOWN);
-				 logger.debug("ActionGroup desconocido: " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
+				 logger.info("ActionGroup desconocido: " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
 			 }
 			 
 			 if (extraGroup != null && !extraGroup.equals(""))
-				 logger.debug(extraGroup + "(extraGroup) sin uso. " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
+				 logger.info(extraGroup + "(extraGroup) sin uso. " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
 		 }
 		 
 		 return true;

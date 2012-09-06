@@ -2,7 +2,9 @@ package org.jotapdiez.jslackpkg.utils;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -11,21 +13,10 @@ import org.apache.log4j.Logger;
 
 public class ResourceMap
 {
-	Logger logger = Logger.getLogger(getClass());
+	Logger logger = Logger.getLogger(getClass().getCanonicalName());
 	
 	public static String		DEFAULT_LANGUAJE	= "es_AR.properties";
 
-//	public static URL			noPhoto				= ResourceMap.class.getResource("/resources/noPhoto.jpg");
-
-//	public static ImageIcon		mainIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/icon-mainProgram.png"));
-
-//	public static ImageIcon		arrowLeftIcon		= new ImageIcon(ResourceMap.class.getResource("/resources/icon-arrowLeft.png"));
-//	public static ImageIcon		arrowRightIcon		= new ImageIcon(ResourceMap.class.getResource("/resources/icon-arrowRight.png"));
-//	public static ImageIcon		addIcon				= new ImageIcon(ResourceMap.class.getResource("/resources/icon-add.png"));
-//	public static ImageIcon		okIcon				= new ImageIcon(ResourceMap.class.getResource("/resources/icon-ok.png"));
-//	public static ImageIcon		searchIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/icon-search.png"));
-//	public static ImageIcon		cleanIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/icon-clean.png"));
-//	public static ImageIcon		deleteIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/icon-delete.png"));
 	public static ImageIcon		closeIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-close.png"));
 	public static ImageIcon		updateIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-update.png"));
 	public static ImageIcon		upgradeIcon			= new ImageIcon(ResourceMap.class.getResource("/resources/images/ico-upgrade.png"));
@@ -68,38 +59,29 @@ public class ResourceMap
 
 	public ResourceMap(String fileName)
 	{
-		changeLanguaje(fileName);
+		loadLanguajeFile(fileName);
 	}
 
-	public void changeLanguaje(String fileName)
+	private void loadLanguajeFile(String fileName)
 	{
-		try
-		{
-			InputStream is = loadFile(fileName);
+		try {
+			logger.info("Cargando archivo de lenguajes: " + fileName);
+			
+			InputStream is = getClass().getResourceAsStream("/lang/" + fileName);
+	
 			_p = new Properties();
-			_p.loadFromXML(is);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
+				_p.loadFromXML(is);
+		} catch (InvalidPropertiesFormatException e) {
+			logger.error("loadLanguajeFile InvalidPropertiesFormatException", e);
+		} catch (IOException e) {
+			logger.error("loadLanguajeFile IOException", e);
 		}
-	}
-
-	private InputStream loadFile(String fileName) throws Exception
-	{
-		logger.debug("Cargando archivo de lenguajes: /lang/" + fileName);
-		
-		InputStream is = getClass().getResourceAsStream("/lang/" + fileName);
-
-		if (is == null)
-			throw new Exception("El archivo " + fileName + " no existe.");
-
-		return is;
 	}
 
 	private Properties getLang()
 	{
 		if (_p == null)
-			changeLanguaje(DEFAULT_LANGUAJE);
+			loadLanguajeFile(DEFAULT_LANGUAJE);
 		return _p;
 	}
 	/**
