@@ -7,8 +7,12 @@ import java.util.Properties;
 
 import javax.swing.ImageIcon;
 
+import org.apache.log4j.Logger;
+
 public class ResourceMap
 {
+	Logger logger = Logger.getLogger(getClass());
+	
 	public static String		DEFAULT_LANGUAJE	= "es_AR.properties";
 
 //	public static URL			noPhoto				= ResourceMap.class.getResource("/resources/noPhoto.jpg");
@@ -47,7 +51,6 @@ public class ResourceMap
 	{
 		if (instance == null)
 		{
-			System.out.println("fileName: " + fileName);
 			if (fileName != null)
 				instance = new ResourceMap(fileName);
 			else
@@ -56,42 +59,23 @@ public class ResourceMap
 		return instance;
 	}
 
-	Properties	_p	= null;
+	private Properties	_p	= null;
 
 	public ResourceMap()
 	{
-		try
-		{
-			InputStream is = loadFile(DEFAULT_LANGUAJE);
-
-			_p = new Properties();
-			_p.loadFromXML(is);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		this(DEFAULT_LANGUAJE);
 	}
 
 	public ResourceMap(String fileName)
 	{
-		try
-		{
-			InputStream is = loadFile(fileName);
-
-			_p = new Properties();
-			_p.loadFromXML(is);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		changeLanguaje(fileName);
 	}
 
 	public void changeLanguaje(String fileName)
 	{
-		InputStream is;
 		try
 		{
-			is = loadFile(fileName);
+			InputStream is = loadFile(fileName);
 			_p = new Properties();
 			_p.loadFromXML(is);
 		} catch (Exception e)
@@ -102,6 +86,8 @@ public class ResourceMap
 
 	private InputStream loadFile(String fileName) throws Exception
 	{
+		logger.debug("Cargando archivo de lenguajes: /lang/" + fileName);
+		
 		InputStream is = getClass().getResourceAsStream("/lang/" + fileName);
 
 		if (is == null)
@@ -110,27 +96,23 @@ public class ResourceMap
 		return is;
 	}
 
+	private Properties getLang()
+	{
+		if (_p == null)
+			changeLanguaje(DEFAULT_LANGUAJE);
+		return _p;
+	}
 	/**
 	 * ********************************************************************
 	 * METODOS PARA EL USO MISMO DE ResourceMap
 	 ** ********************************************************************/
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
 	public String getString(String key)
 	{
-		if (_p == null)
-			return null;
-		return _p.getProperty(key);
+		return getLang().getProperty(key);
 	}
 
 	public Color getColor(String key)
 	{
-		if (_p == null)
-			return null;
 		String[] color_split = getString(key).split(",");
 		if (color_split.length <= 2)
 			return null;
@@ -143,8 +125,6 @@ public class ResourceMap
 
 	public Font getFont(String key)
 	{
-		if (_p == null)
-			return null;
 		String font = getString(key).trim();
 		return new Font(font, 0, 0);
 	}

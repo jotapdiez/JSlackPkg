@@ -21,6 +21,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.entities.Package.STATE;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
@@ -30,6 +31,8 @@ import org.jotapdiez.jslackpkg.utils.ResourceMap;
 
 public class JSlackpkgPackageManager implements PackageManager
 {
+	Logger logger = Logger.getLogger(getClass());
+	
 	private final String INSTALLED_PACKAGES_PATH = "/var/log/packages/";
 
 	private final SettingsManager settingsManager = SettingsManager.getInstance();
@@ -42,7 +45,6 @@ public class JSlackpkgPackageManager implements PackageManager
 	private List<Package> upgradedPackages = null;
 	private List<Package> removedPackages = null;
 	
-	char[] changeLog = null;
 	char[] packagesInfo = null;
 
 	File tmpDir = new File(System.getProperty("java.io.tmpdir")+File.separator+"jslackpkg");
@@ -150,17 +152,6 @@ public class JSlackpkgPackageManager implements PackageManager
 				packageItem.setState(Package.STATE.INSTALLED);				
 				fullPackages.put(packageItem.getFullName(), packageItem);
 			}
-			
-//			while (scannerLinea.hasNext())
-//			{
-//				Package packageItem = parsePackageInformation("PACKAGE NAME:" + scannerLinea.next());
-//				
-//				if (packageItem == null)
-//					continue;
-//				
-//				packageItem.setState(Package.STATE.INSTALLED);				
-//				fullPackages.put(packageItem.getName(), packageItem);
-//			}
 		}
 	}
 	
@@ -200,11 +191,9 @@ public class JSlackpkgPackageManager implements PackageManager
 	{
 		List<Package> list = new LinkedList<Package>();
 		scannerLinea.useDelimiter("\n");
-		//scannerLinea.skip("FILE LIST");
 		
 		boolean isInDescription = false;
 		String description = "";
-//		String realName = null;
 		
 		Package packageItem = null;
 		String descriptionRegexp = "^#NAME#:[ ]?";
@@ -247,29 +236,10 @@ public class JSlackpkgPackageManager implements PackageManager
 			}else if (itemInfo.startsWith("DESCRIPTION") )
 			{
 				isInDescription = true;
-				//description = description.replaceAll("^[^:]*:\\s", "");
-				
 			}else if (isInDescription && itemInfo.matches("[^:]*:[\\s]?.*"))
 			{
-//				if (descriptionRegexp.indexOf("#NAME#") > -1)
-//					descriptionRegexp = descriptionRegexp.replace("#NAME#", packageItem.getName(true));
-//				if (realName == null)
-//				{
-//					Pattern pattern = Pattern.compile("([^:]*):[\\s]?.*");
-//					Matcher matcher = pattern.matcher(itemInfo);
-//					if (matcher.find())
-//					{
-//						realName = matcher.group(1);
-//						packageItem.setRealName(realName);
-//					}
-//				}
-//				Pattern pattern = Pattern.compile("[^:]*:[\\s]?");
-//				Matcher matcher = pattern.matcher(itemInfo);
-//				description += matcher.replaceAll("")+"\n";
 				description += itemInfo.replaceFirst(descriptionRegexp, "")+"\n"; // getName(true):: el true es para retornar el nombre escapeado
 			}
-			
-//			System.out.println(scannerLinea.next());
 		}
 		
 		if (packageItem != null && description != null && !description.equals(""))
@@ -290,48 +260,145 @@ public class JSlackpkgPackageManager implements PackageManager
 		upgradedPackages = new LinkedList<Package>();
 		removedPackages = new LinkedList<Package>();
 		
-		if (changeLog == null)
-		{
-			String result = downloadFile("ChangeLog.txt");
-			changeLog = result.toCharArray();
-			
-//			System.out.println("============================= CHangeLog.txt:\n"+result);
-			Scanner dateScanner = new Scanner(result);
-//			Scanner dateScanner = null;
-//			try {
-//				dateScanner = new Scanner(new File("/home/juanpablo/ChangeLog.txt"));
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
-			result = null;
-			dateScanner.useDelimiter("\\+--------------------------\\+");
-			
-			StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.parsing_file.text").replaceFirst("%FILE%", "ChangeLog.txt"));
-			StatusBar.getInstance().resetProgress();
+		String result = downloadFile("ChangeLog.txt");
+		
+		Scanner dateScanner = new Scanner(result);
+		result = null;
+		dateScanner.useDelimiter("\\+--------------------------\\+");
+		
+		StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.parsing_file.text").replaceFirst("%FILE%", "ChangeLog.txt"));
+		StatusBar.getInstance().resetProgress();
 
-			while (dateScanner.hasNext())
-			{
-				String date = dateScanner.next();
-//				System.out.println("=====================================================================================Date:\n" + date);
-//				parseChangeLogDateScanner(date);
-				/*boolean validDate = */parseChangeLogDateRegexp2(date);
-//				if (!validDate)
-//					break;
-			}
-			
-			String finalProgressMessage = "";
-			finalProgressMessage += ResourceMap.getInstance().getString("statusbar.info.update_cant.text").replaceFirst("%CANT%", String.valueOf(upgradedPackages.size()));
-			finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + ResourceMap.getInstance().getString("statusbar.info.new_cant.text").replaceFirst("%CANT%", String.valueOf(newPackages.size()));
-			finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + ResourceMap.getInstance().getString("statusbar.info.removed_cant.text").replaceFirst("%CANT%", String.valueOf(removedPackages.size()));
-		 
-			StatusBar.getInstance().setFocusComponentText(finalProgressMessage);
-			StatusBar.getInstance().resetProgress();
+		while (dateScanner.hasNext())
+		{
+			String date = dateScanner.next();
+			parseChangeLog(date);
 		}
+		
+		String finalProgressMessage = "";
+		finalProgressMessage += ResourceMap.getInstance().getString("statusbar.info.update_cant.text").replaceFirst("%CANT%", String.valueOf(upgradedPackages.size()));
+		finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + ResourceMap.getInstance().getString("statusbar.info.new_cant.text").replaceFirst("%CANT%", String.valueOf(newPackages.size()));
+		finalProgressMessage += (finalProgressMessage.equals("") ? "" : " | " ) + ResourceMap.getInstance().getString("statusbar.info.removed_cant.text").replaceFirst("%CANT%", String.valueOf(removedPackages.size()));
+	 
+		StatusBar.getInstance().setFocusComponentText(finalProgressMessage);
+		StatusBar.getInstance().resetProgress();
 	}
 		
-	private boolean parseChangeLogDateRegexp2(String changeLog)
+	private boolean parseChangeLog(String changeLog)
 	{
-		String changeLogParserRegexp = "^([a-z|A-Z]*)\\/([^:]*):\\s(.*)\\.(.*)$"; //"^([^\\/])\\/([^:]*):\\s(.*)\\.(.*)$";
+		String changeLogParserRegexp = "^([a-z|A-Z]*)\\/(.*)$"; //"^([a-z|A-Z]*)\\/([^:]*):\\s(.*)\\.(.*)$";
+		
+		 Pattern pattern = Pattern.compile(changeLogParserRegexp, Pattern.MULTILINE);
+		 Matcher matcher = pattern.matcher(changeLog);
+
+		 int total = 0;
+		 while (matcher.find())
+		 {
+			 ++total;
+		 }
+		 
+		 StatusBar.getInstance().setTotal(total);
+		 
+		 matcher = pattern.matcher(changeLog);
+		 while (matcher.find())
+		 {
+			 String locationGroup = matcher.group(1).trim();
+			 Package packageItem = new Package();
+			 
+//			 logger.debug("* ===================================== *");
+//			 logger.debug("locationGroup: " + locationGroup);
+//			 logger.debug("matcher.group(2): " + matcher.group(2));
+			 
+			 String[] split = matcher.group(2).split(":");
+			 
+			 packageItem.setFileName(split[0]);
+//			 logger.debug("split[0]: " + split[0]);
+
+			 if (packageItem.getFullName().equals(""))
+			 {
+				 logger.error("PackageItem invalido: " + split[0]);
+				 continue;
+			 }
+			 
+			 { //Copio la descripcion y si no esta en esta lista no se muestra nada porque es viejo
+				 Package packageItemTmp = getPackage(packageItem.getFullName());
+//				 logger.debug("packageItem.getFullName(): " + packageItem.getFullName());
+				 if (packageItemTmp == null || !packageItemTmp.equalsExact(packageItem))
+				 {
+					 logger.debug("continue - FullName: " + packageItem.getFullName());
+					 continue;
+				 }
+				 
+				 packageItem.setDescription( packageItemTmp.getDescription() );
+				 packageItem.setCompressedSize(packageItemTmp.getCompressedSize());
+				 packageItem.setUncompressedSize(packageItemTmp.getUncompressedSize());
+			 }
+			 
+			 String actionGroup = null;
+			 String extraGroup = null;
+			 
+			 if (split.length>1)
+			 {
+				 actionGroup = split[1].trim();
+				 
+				 if (actionGroup.split(".").length>1)
+				 {
+					 String[] extraSplit = actionGroup.split("."); 
+					 actionGroup = extraSplit[0].trim();
+					 extraGroup = extraSplit[1].trim();
+				 }else if (actionGroup.endsWith("."))
+					 actionGroup = actionGroup.replaceAll("\\.", "");
+			 }
+			 StatusBar.getInstance().increaseProgress();
+
+			 packageItem.setLocation(locationGroup);
+			 
+			 if (actionGroup == null)
+				 continue;
+			 
+			 if (actionGroup.equals("Upgraded"))
+			 {
+				 if (!addUpgradePackage(packageItem))
+					 continue;
+			 }else if (actionGroup.equals("Added"))
+			 {
+				 if (!addNewPackage(packageItem))
+					 continue;
+			 }else if (actionGroup.equals("Removed"))
+			 {
+				 if (!addRemovePackage(packageItem))
+					 continue;
+			 }else if (actionGroup.equals("Rebuilt"))
+			 {
+				 if (installedPackages.containsValue(packageItem)) // SOLO chekea el nombre
+				 {
+					 if (!addUpgradePackage(packageItem))
+						 continue;
+				}else
+				{
+					if (!addNewPackage(packageItem))
+						 continue;
+				}
+			 }else if (actionGroup.equals("Reverted"))
+			 {
+				 packageItem.setState(Package.STATE.UNKNOWN);
+				 //TODO: Hacer que?
+				 logger.debug("ActionGroup Reverted (Sin uso) - Paquete: " + packageItem.getFileName());
+			 }else
+			 {
+				 packageItem.setState(Package.STATE.UNKNOWN);
+				 logger.debug("ActionGroup desconocido: " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
+			 }
+			 
+			 if (extraGroup != null && !extraGroup.equals(""))
+				 logger.debug(extraGroup + "(extraGroup) sin uso. " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
+		 }
+		 
+		 return true;
+	}
+	private boolean parseChangeLogOld(String changeLog)
+	{
+		String changeLogParserRegexp = "^([a-z|A-Z]*)\\/([^:]*):\\s([^\\.]*)\\.(.*)$"; //"^([a-z|A-Z]*)\\/([^:]*):\\s(.*)\\.(.*)$";
 		
 		 Pattern pattern = Pattern.compile(changeLogParserRegexp, Pattern.MULTILINE);
 		 Matcher matcher = pattern.matcher(changeLog);
@@ -352,15 +419,14 @@ public class JSlackpkgPackageManager implements PackageManager
 			 packageItem.setFileName(matcher.group(2));
 			 if (packageItem.getFullName().equals(""))
 			 {
-//				 System.out.println("packageItem invalido: " + matcher.group(2)); // TODO: Ver si no se escapo alguno valido
+				 logger.debug("PackageItem invalido: " + matcher.group(2));
 				 continue;
 			 }
 			 
 			 { //Copio la descripcion y si no esta en esta lista no se muestra nada porque es viejo
 				 Package packageItemTmp = getPackage(packageItem.getFullName());
-				 
+				 logger.debug("packageItem.getFullName(): " + packageItem.getFullName());
 				 if (packageItemTmp == null || !packageItemTmp.equalsExact(packageItem))
-//				 if (!isSlackwareCurrentPackage(packageItem))
 					 continue;
 				 
 				 packageItem.setDescription( packageItemTmp.getDescription() );
@@ -409,37 +475,32 @@ public class JSlackpkgPackageManager implements PackageManager
 			 {
 				 packageItem.setState(Package.STATE.UNKNOWN);
 				 //TODO: Hacer que?
-//				 System.out.println(packageFileName.toString() + " (in " + locationGroup+") was " + actionGroup); //TODO: A archivo de lenguajes
+				 logger.debug("ActionGroup Reverted (Sin uso) - Paquete: " + packageItem.getFileName());
 			 }else
 			 {
 				 packageItem.setState(Package.STATE.UNKNOWN);
-//				 System.out.println(packageFileName.toString() + " (in " + locationGroup+") was " + actionGroup); //TODO: A archivo de lenguajes
+				 logger.debug("ActionGroup desconocido: " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
 			 }
 			 
-//			 if (extraGroup != null && !extraGroup.equals(""))
-//				 System.out.println(packageFileName.toString() + " (in " + locationGroup+") has extra data: " + extraGroup); //TODO: A archivo de lenguajes
-			 
-//			 fullPackages.put(packageItem.getName(), packageItem);
-//			 StatusBar.getInstance().increaseProgress();
+			 if (extraGroup != null && !extraGroup.equals(""))
+				 logger.debug(extraGroup + "(extraGroup) sin uso. " + actionGroup + " | Paquete: " + packageItem.getFileName()); //TODO: A archivo de lenguajes
 		 }
 		 
 		 return true;
 	}
-	
+
+	/**
+	 * Chekea si hay alguna version de el paquete instalada en el sistema.
+	 * Es para saber si un paquete en upgrade, en nuestra maquina es new (ninguna version instalada) o upgrade (alguna version instalada)
+	 * @param packageItem Paquete con los datos para chekear
+	 * @return true si existe alguna version instalada, false en caso contrario
+	 */
 	private boolean hasSomeVersionInstalled(Package packageItem)
 	{
 		Package packageItemTmp = installedPackages.get(packageItem.getName());
 		if ( packageItemTmp == null)
 			return false;
 		return true;
-	}
-	
-	private String getPackageDescription(Package packageItem)
-	{
-		Package packageItemTmp = getPackage(packageItem.getFullName());
-		if (packageItemTmp == null)
-			return "";
-		return packageItemTmp.getDescription();
 	}
 	
 	/**
@@ -460,6 +521,11 @@ public class JSlackpkgPackageManager implements PackageManager
 		 return true;
 	}
 	
+	/**
+	 * Agrega un paquete a la lista de paquetes a actualizar.(paquetes en modo upgrade)
+	 * @param packageItem
+	 * @return
+	 */
 	private boolean addUpgradePackage(Package packageItem)
 	{
 		if (!hasSomeVersionInstalled(packageItem)) // Si no hay ninguna version instalada, por mas que sea un upgrade se debe instalar como nuevo
@@ -480,6 +546,11 @@ public class JSlackpkgPackageManager implements PackageManager
 		return true;
 	}
 	
+	/**
+	 * Agrega un paquete a la lista de paquetes a instalar  (Paquetes nuevos o nunca instalados).
+	 * @param packageItem
+	 * @return
+	 */
 	private boolean addNewPackage(Package packageItem)
 	{
 		if (hasSomeVersionInstalled(packageItem)) // Si hay alguna version instalada, por mas que sea un added se debe actualizar
@@ -496,6 +567,11 @@ public class JSlackpkgPackageManager implements PackageManager
 		return true;
 	}
 	
+	/**
+	 * Agrega un paquete a la lista de paquetes a eliminar.
+	 * @param packageItem
+	 * @return
+	 */
 	private boolean addRemovePackage(Package packageItem)
 	{
 		if (!hasSomeVersionInstalled(packageItem)) // Si no hay ninguna version instalada, por mas que sea un remove no hay nada que borrar
@@ -589,14 +665,8 @@ public class JSlackpkgPackageManager implements PackageManager
 		
 		System.out.println("Install");
 		
-		String packageRemoteFile = settingsManager.getOption(SettingsManager.Section.REPO, "mirror")+"/slackware/"+packageItem.getLocation()+"/"+packageItem.getFileName();
-		System.out.println("packageRemoteFile: " + packageRemoteFile);
-		
-		String packageLocalFile = packageItem.getFileName();
-		System.out.println("packageLocalFile: " + packageLocalFile);
-		
 		//Download package
-		packageLocalFile = downloadPackage(packageRemoteFile, packageLocalFile);
+		String packageLocalFile = downloadPackage(packageItem);
 		
 //		procArgs.add("-warn"); //dry-run. PARA DEBUG
 		
@@ -669,16 +739,22 @@ public class JSlackpkgPackageManager implements PackageManager
 		return isInstalled;
 	}
 	
-	private String downloadPackage(String remoteFile, String fileName)
+	/**
+	 * Descarga un paquete del mirror seleccionado en la configuracion
+	 * @param remoteFile {@link Package} a descargar
+	 * @param fileName 
+	 * @return el path absoluto donde se descargo el paquete
+	 */
+	private String downloadPackage(Package packageItem)
 	{
 		try {
-			StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.downloading.text").replaceFirst("%FILE%", fileName));
+			StatusBar.getInstance().setFocusComponentText(ResourceMap.getInstance().getString("statusbar.info.downloading.text").replaceFirst("%FILE%", packageItem.getFileName()));
 //			String state = "Descargando: ";
 //			infoPanel.setState(state);
 //			infoPanel.updateProgress(0);
 //			logger.debug("downloadFile:"+remoteFile+" to "+localFile);
 
-			URL url = new URL(remoteFile);
+			URL url = new URL(settingsManager.getOption(SettingsManager.Section.REPO, "mirror")+"/slackware/"+packageItem.getLocation()+"/"+packageItem.getFileName());
 			URLConnection conexion = url.openConnection();
 			conexion.connect();
 
@@ -688,7 +764,7 @@ public class JSlackpkgPackageManager implements PackageManager
 //			infoPanel.setTotalPB(lenghtOfFile);
 			InputStream input = new BufferedInputStream(url.openStream());
 			
-			File local = new File(tmpDir, fileName);
+			File local = new File(settingsManager.getWorkingDir(), packageItem.getFileName());
 			if (!local.exists())
 				local.createNewFile();
 			
@@ -716,10 +792,10 @@ public class JSlackpkgPackageManager implements PackageManager
 			return local.getAbsolutePath();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-//			logger.error("MalformedURLException", e);
+			logger.error("MalformedURLException", e);
 		} catch (IOException e) {
 			e.printStackTrace();
-//			logger.error("IOException", e);
+			logger.error("IOException", e);
 		}
 		return null;
 	}
@@ -740,7 +816,7 @@ public class JSlackpkgPackageManager implements PackageManager
 	}
 
 	/**
-	 * Descarga el archivo file del mirror seleccionado en la configuracion
+	 * Descarga el archivo del mirror seleccionado en la configuracion
 	 * @param file {@link String} con el nombre del archivo a descargar
 	 * @return {@link String} con el contenido del archivo descargado
 	 */
@@ -770,9 +846,9 @@ public class JSlackpkgPackageManager implements PackageManager
 	        StatusBar.getInstance().resetText();
 	        return result.toString();
 		} catch (MalformedURLException ex) {
-			ex.printStackTrace();
+			logger.error("downloadFile", ex);
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			logger.error("downloadFile", ex);
 		}
 		return "";
 	}

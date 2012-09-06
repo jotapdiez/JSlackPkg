@@ -11,6 +11,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
+import org.apache.log4j.Logger;
 import org.jotapdiez.jslackpkg.JSlackpkg;
 
 import sun.misc.IOUtils;
@@ -48,10 +49,14 @@ public class SettingsManager
 		}
 	}
 	
+	private Logger logger = Logger.getLogger(getClass());
+	
 	private static Class<JSlackpkg> packageForNode = JSlackpkg.class;
 	private Preferences prefs = null;
 	private Preferences actualNode = null;
 	private static SettingsManager _instance = null;
+	
+	private File jslackpkgDir = null;
 	
 	public static SettingsManager getInstance()
 	{
@@ -60,22 +65,26 @@ public class SettingsManager
 		return _instance;
 	}
 	
+	public String getWorkingDir()
+	{
+		return jslackpkgDir.getAbsolutePath();
+	}
+	
 	private SettingsManager() {
 		String homeUserPath = System.getProperty("user.home");
 		
-		File jslackpkgDir = new File(homeUserPath, ".jslackpkg");
+		jslackpkgDir = new File(homeUserPath, ".jslackpkg");
 		if (!jslackpkgDir.exists())
 			jslackpkgDir.mkdir();
 		
-		System.out.println("jslackpkgDir: " + jslackpkgDir.getAbsolutePath());
+		logger.info("Directorio de la aplicacion: " + jslackpkgDir.getAbsolutePath()); //TODO: Archivo de lenguajes
 		
 		File userConfigFile = new File(jslackpkgDir, "config.xml");
 		if (!userConfigFile.exists())
 		{
-			System.out.println("Escribiendo archivo de configuracion en el usuario.");
-			saveDefaults(jslackpkgDir.getAbsolutePath());
+			logger.info("Escribiendo archivo de configuracion en el usuario en " + userConfigFile.getAbsolutePath());
+			saveDefaults(getWorkingDir());
 		}
-		System.out.println("userConfigFile: " + userConfigFile.getAbsolutePath());
 		
 //		String path = getClass().getResource("/resources/config").getPath();
 		load(jslackpkgDir.getAbsolutePath());
@@ -173,7 +182,7 @@ public class SettingsManager
 		return Section.values();
 	}
 
-	public static void saveDefaults(String parentPath)
+	public void saveDefaults(String parentPath)
 	{
       // Retrieve the user preference node for the package java.lang
 		Preferences prefs = Preferences.userNodeForPackage(packageForNode);
@@ -208,8 +217,9 @@ public class SettingsManager
 		}
 		
 		try {
-			System.out.println(new File(parentPath+"/config.xml").getAbsolutePath());
-			prefs.exportSubtree(new FileOutputStream(parentPath+"/config.xml"));
+			File configFileName = new File(parentPath+"/config.xml"); 
+			logger.info("Escribiendo configuracion en "+configFileName.getAbsolutePath()); //TODO: Archivo de lenguajes
+			prefs.exportSubtree(new FileOutputStream(configFileName));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (BackingStoreException e) {
