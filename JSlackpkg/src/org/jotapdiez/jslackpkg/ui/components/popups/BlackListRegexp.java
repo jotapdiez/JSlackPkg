@@ -1,4 +1,4 @@
-package org.jotapdiez.jslackpkg.ui.popups;
+package org.jotapdiez.jslackpkg.ui.components.popups;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
