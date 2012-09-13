@@ -23,8 +23,8 @@ public class PackagesTable extends JTable
 		setAutoCreateColumnsFromModel(true);
 		
 //		setDefaultRenderer(Boolean.class, new PackagesTableCellRenderer());
-//		setDefaultRenderer(Double.class, new PackagesTableCellRenderer());
-//		setDefaultRenderer(String.class, new PackagesTableCellRenderer());
+		setDefaultRenderer(Double.class, new PackagesTableCellRenderer());
+		setDefaultRenderer(String.class, new PackagesTableCellRenderer());
 //		setCellEditor(new PackagesCellEditor());
 		
 		setCellSelectionEnabled(true);
@@ -113,6 +113,24 @@ public class PackagesTable extends JTable
 		}
 		
 		return list;
+	}
+
+	public void addPackage(Package packageItem)
+	{
+		model.addPackage(packageItem);
+		model.fireTableDataChanged();
+	}
+
+	public void removePackage(Package packageItem)
+	{
+		model.removePackage(packageItem);	
+		model.fireTableDataChanged();
+	}
+
+	public void updatePackage(Package packageItem)
+	{
+		model.updatePackage(packageItem);	
+		model.fireTableDataChanged();
 	}
 	
 	private static final long	serialVersionUID	= 1285320561554247588L;

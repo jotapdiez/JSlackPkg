@@ -1,3 +1,15 @@
+2012-09-10 ============================================
+Panel de informacion y Lista de paquetes, Core, JavaDoc
+- Arreglado error al seleccionar (doble click) un packages de la lista.
+- Arreglado el scoll-down automatico al actualizar la informacion del package
+- Agregada clase PackageManagerImpl con los metodos basicos para el trabajo con Packages
+- Actualizado un poco el JavaDoc
+- Agregados Observer para cada tipo de lista de paquetes dedicados a la modificacion de la lista segun la accion ejecutada sobre un paquete.
+- Modificado la clase JSlackpkgPackageManager para centralizar la ejecucion de acciones sobre paquetes (install, upgrade y remove), utilizar los Observer de paquetes y verificar que la salida del comando no dio error (hardcodeado)
+- Se oculta el panel de info cuando se elimina un package
+- Se muestran solo el boton correcto para las acciones en bulk en la lista de packages
+- Arreglado el render de la lista de packages
+
 2012-09-03 ============================================
 - Al seleccionar paquete de la lista se muestra el panel de info.
 - Agregados los botones para eliminar, actualizar o instalar paquetes en bulk. 

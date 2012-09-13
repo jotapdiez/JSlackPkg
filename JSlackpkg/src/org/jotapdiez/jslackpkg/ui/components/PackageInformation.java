@@ -12,10 +12,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 
 import org.jotapdiez.jslackpkg.core.blacklist.BlackListManager;
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
+import org.jotapdiez.jslackpkg.ui.components.custom.splitPane.SplitPane;
 import org.jotapdiez.jslackpkg.utils.Conversions;
 import org.jotapdiez.jslackpkg.utils.ResourceMap;
 
@@ -26,21 +28,22 @@ import com.jgoodies.forms.layout.RowSpec;
 
 public class PackageInformation extends JPanel
 {
-	private final JTextField			txtName				= new JTextField();
-	private final JTextField			txtVersion			= new JTextField();
-	private final JTextField			txtState			= new JTextField();
-	private final JTextField			txtSize				= new JTextField();
-	private final JTextField			txtInstalledSize	= new JTextField();
-	private final JTextArea				txtDescription		= new JTextArea();
+	private final JTextField	txtName				= new JTextField();
+	private final JTextField	txtVersion			= new JTextField();
+	private final JTextField	txtState			= new JTextField();
+	private final JTextField	txtSize				= new JTextField();
+	private final JTextField	txtInstalledSize	= new JTextField();
+	private final JTextArea		txtDescription		= new JTextArea();
 
-	private final JButton				btnInstall			= new JButton(ResourceMap.getInstance().getString("packageInformation.button.actions.install.text"));
-	private final JButton				btnUninstall		= new JButton(ResourceMap.getInstance().getString("packageInformation.button.actions.remove.text"));
-	private final JButton				btnBlackListAdd		= new JButton(ResourceMap.getInstance().getString("packageInformation.button.blacklist.add.text"), ResourceMap.searchRemoveIcon );
-	private final JButton				btnBlackListRemove	= new JButton(ResourceMap.getInstance().getString("packageInformation.button.blacklist.remove.text"), ResourceMap.searchAddIcon    );
+	private final JButton		btnInstall			= new JButton(ResourceMap.getInstance().getString("packageInformation.button.actions.install.text"), ResourceMap.addIcon);
+	private final JButton		btnUninstall		= new JButton(ResourceMap.getInstance().getString("packageInformation.button.actions.remove.text"), ResourceMap.removeIcon);
+	private final JButton		btnBlackListAdd		= new JButton(ResourceMap.getInstance().getString("packageInformation.button.blacklist.add.text"), ResourceMap.searchRemoveIcon);
+	private final JButton		btnBlackListRemove	= new JButton(ResourceMap.getInstance().getString("packageInformation.button.blacklist.remove.text"), ResourceMap.searchAddIcon);
+	private final JButton		btnUpgrade			= new JButton(ResourceMap.getInstance().getString("packageInformation.button.blacklist.upgrade.text"), ResourceMap.upgradeIcon);
+	private PackageManager		packageManager		= null;
 
-	private PackageManager				packageManager		= null;
-
-	private Package						_packageItem		= null;
+	private Package				_packageItem		= null;
+	private SplitPane parent = null;
 
 	public PackageInformation(PackageManager packageManager)
 	{
@@ -57,26 +60,9 @@ public class PackageInformation extends JPanel
 		informationPanel.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packageInformation.panel.info.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		add(informationPanel);
-		informationPanel.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("121px:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,},
-			new RowSpec[] {
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,}));
+		informationPanel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("121px:grow"),
+				FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, }));
 
 		JLabel lblName = new JLabel(ResourceMap.getInstance().getString("packageInformation.label.name.text"));
 		informationPanel.add(lblName, "2, 1, left, default");
@@ -105,7 +91,11 @@ public class PackageInformation extends JPanel
 		txtDescription.setRows(5);
 		txtDescription.setColumns(10);
 		txtDescription.setEditable(false);
-		
+
+		// Evita el scoll-down al actualizar el contenido
+		DefaultCaret caret = (DefaultCaret) txtDescription.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+
 		JScrollPane scrollPane = new JScrollPane(txtDescription);
 		informationPanel.add(scrollPane, "5, 11, fill, fill");
 
@@ -115,7 +105,7 @@ public class PackageInformation extends JPanel
 		informationPanel.add(txtVersion, "5, 3, fill, default");
 		txtVersion.setColumns(10);
 		txtVersion.setEditable(false);
-		
+
 		JLabel lblState = new JLabel(ResourceMap.getInstance().getString("packageInformation.label.state.text"));
 		informationPanel.add(lblState, "2, 5, left, default");
 
@@ -134,104 +124,118 @@ public class PackageInformation extends JPanel
 			JPanel addRemovePanel = new JPanel();
 			actionsPanel.add(addRemovePanel);
 			addRemovePanel.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packageInformation.panel.actions.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			addRemovePanel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.GROWING_BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-					FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
-	
-			btnInstall.setIcon(ResourceMap.addIcon);
-			addRemovePanel.add(btnInstall, "2, 1, fill, center");
-	
-			btnUninstall.setIcon(ResourceMap.removeIcon);
-			addRemovePanel.add(btnUninstall, "2, 3, fill, center");
+			addRemovePanel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.GROWING_BUTTON_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.DEFAULT_ROWSPEC,
+					FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+
+			addRemovePanel.add(btnInstall, "2, 1, center, center");
+			addRemovePanel.add(btnUninstall, "2, 3, center, center");
+			addRemovePanel.add(btnUpgrade, "2, 5, center, fill");
 		}
 
 		{
 			JPanel blackListPanel = new JPanel();
 			blackListPanel.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packageInformation.panel.blacklist.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			actionsPanel.add(blackListPanel);
-			blackListPanel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.GROWING_BUTTON_COLSPEC, }, new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-					FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
-	
-			btnInstall.setEnabled(false);
-			btnInstall.addActionListener(new ActionListener() {
+			blackListPanel.setLayout(new FormLayout(new ColumnSpec[] {
+					FormFactory.RELATED_GAP_COLSPEC,
+					FormFactory.GROWING_BUTTON_COLSPEC,
+					FormFactory.RELATED_GAP_COLSPEC,},
+				new RowSpec[] {
+					FormFactory.DEFAULT_ROWSPEC,
+					FormFactory.RELATED_GAP_ROWSPEC,
+					FormFactory.DEFAULT_ROWSPEC,
+					FormFactory.RELATED_GAP_ROWSPEC,
+					FormFactory.DEFAULT_ROWSPEC,}));
+
+			btnInstall.addActionListener(new ActionListener()
+			{
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e)
+				{
 					doInstall(_packageItem);
 				}
 			});
-			btnUninstall.setEnabled(false);
-			btnUninstall.addActionListener(new ActionListener() {
+			btnUninstall.addActionListener(new ActionListener()
+			{
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e)
+				{
 					doRemove(_packageItem);
 				}
 			});
-			btnBlackListAdd.setEnabled(false);
-			btnBlackListAdd.addActionListener(new ActionListener() {
+			btnBlackListAdd.addActionListener(new ActionListener()
+			{
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e)
+				{
 					doBlackListAdd();
 				}
 			});
-			blackListPanel.add(btnBlackListAdd, "1, 3");
-			
-			
-			btnBlackListRemove.setEnabled(false);
-			btnBlackListRemove.addActionListener(new ActionListener() {
+			blackListPanel.add(btnBlackListAdd, "2, 1");
+
+			btnBlackListRemove.addActionListener(new ActionListener()
+			{
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e)
+				{
 					doBlackListRemove();
 				}
 			});
-			blackListPanel.add(btnBlackListRemove, "1, 5, fill, center");
+			blackListPanel.add(btnBlackListRemove, "2, 3, fill, center");
 		}
 	}
 
-	private void doBlackListAdd() {
+	private void doBlackListAdd()
+	{
 		if (_packageItem == null)
 			return;
-		
+
 		BlackListManager.getInstance().add(_packageItem);
 		updateButtons();
 	}
-	
-	private void doBlackListRemove() {
+
+	private void doBlackListRemove()
+	{
 		if (_packageItem == null)
 			return;
-		
+
 		BlackListManager.getInstance().remove(_packageItem);
 		updateButtons();
 	}
-	
+
 	private void doRemove(Package packageItem)
 	{
 		if (packageItem == null)
 			return;
-		
+
 		boolean succesful = packageManager.remove(packageItem);
 		if (succesful)
+		{
 			setPackage(null);
+			parent.hidePanel();
+		}
 	}
 
 	private void doInstall(Package packageItem)
 	{
 		if (packageItem == null)
 			return;
-		
+
 		boolean succesful = packageManager.install(packageItem);
 		if (succesful)
 			setPackage(packageItem);
 	}
-	
+
 	public void setPackage(Package packageItem)
 	{
 		_packageItem = packageItem;
-		
-		if (_packageItem ==null)
+
+		if (_packageItem == null)
 		{
 			cleanPackage();
 			return;
 		}
-		
+
 		mapPackage();
 	}
 
@@ -239,7 +243,7 @@ public class PackageInformation extends JPanel
 	{
 		txtName.setText(_packageItem.getName());
 		txtVersion.setText(_packageItem.getVersion());
-		
+
 		{
 			double val = Double.parseDouble(_packageItem.getUncompressedSize());
 			txtInstalledSize.setText(Conversions.parseSize(val));
@@ -254,32 +258,41 @@ public class PackageInformation extends JPanel
 		updateButtons();
 	}
 
-	private void cleanPackage() {
+	private void cleanPackage()
+	{
 		txtName.setText("");
 		txtVersion.setText("");
-		
+
 		txtInstalledSize.setText("");
 		txtSize.setText("");
 		txtState.setText("");
 		txtDescription.setText("");
 
-		btnInstall.setEnabled(false);
-		btnUninstall.setEnabled(false);
-		
-		btnBlackListAdd.setEnabled(false);
-		btnBlackListRemove.setEnabled(false);
+		btnInstall.setVisible(false);
+		btnUninstall.setVisible(false);
+
+		btnBlackListAdd.setVisible(false);
+		btnBlackListRemove.setVisible(false);
 	}
-	
+
 	private void updateButtons()
 	{
-		boolean installed = _packageItem.getState().equals(Package.STATE.INSTALLED);
-		
-		btnInstall.setEnabled(!installed);
-		btnUninstall.setEnabled(installed);
-		
-		boolean isInBlackList = _packageItem.isInBlackList();
-		btnBlackListAdd.setEnabled(!isInBlackList);
-		btnBlackListRemove.setEnabled(isInBlackList);
+		boolean installed = _packageItem != null && _packageItem.getState().equals(Package.STATE.INSTALLED);
+
+		btnInstall.setVisible(!installed);
+		btnUninstall.setVisible(installed);
+
+		boolean isInBlackList = _packageItem != null && _packageItem.isInBlackList();
+		btnBlackListAdd.setVisible(!isInBlackList);
+		btnBlackListRemove.setVisible(isInBlackList);
+
+		boolean toUpgrade = _packageItem != null && _packageItem.getState().equals(Package.STATE.TO_UPGRADE);
+		btnUpgrade.setVisible(toUpgrade);
+	}
+
+	public void setSplitPanel(SplitPane splitPane)
+	{
+		parent = splitPane;
 	}
 
 	private static final long	serialVersionUID	= 7546213147519598392L;

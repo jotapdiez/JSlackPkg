@@ -9,8 +9,13 @@ public interface PackageManager
 	public void update();
 	
 	public boolean upgrade(Package packageItem);
+	public boolean upgrade(List<Package> list);
+	
 	public boolean install(Package packageItem);
+	public boolean install(List<Package> list);
+	
 	public boolean remove(Package packageItem);
+	public boolean remove(List<Package> list);
 	
 	public void clean();
 

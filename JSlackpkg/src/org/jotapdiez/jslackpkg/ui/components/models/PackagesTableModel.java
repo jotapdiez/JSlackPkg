@@ -2,7 +2,6 @@ package org.jotapdiez.jslackpkg.ui.components.models;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.jotapdiez.jslackpkg.core.entities.Package;
@@ -20,24 +19,8 @@ public class PackagesTableModel extends DefaultTableModel
 	
 	String[] _columnNames	= new String[] { COLUMN_NAME, COLUMN_INSTALLED_SIZE, COLUMN_VERSION, COLUMN_BUILD, COLUMN_LOCATION };
 
-	private Map<Integer, Item>	_data			= null;
+	private Map<Integer, Package>	_data			= null;
 
-	class Item
-	{
-		public boolean selected = false;
-		public Package packageItem = null;
-		
-		public Item(Package pack)
-		{
-			this(pack, false);
-		}
-		public Item(Package pack, boolean selected)
-		{
-			this.selected = selected;
-			packageItem = pack;
-		}
-	}
-	
 	public PackagesTableModel() {
 	}
 	
@@ -67,7 +50,7 @@ public class PackagesTableModel extends DefaultTableModel
 		if (packages == null || packages.size() == 0)
 			return;
 
-		_data = new HashMap<Integer, Item>(packages.size());
+		_data = new HashMap<Integer, Package>(packages.size());
 
 		Iterator<Package> it = packages.iterator();
 		int index = 0;
@@ -76,7 +59,7 @@ public class PackagesTableModel extends DefaultTableModel
 			Package packageItem = it.next();
 			if (packageItem == null)
 				continue;
-			_data.put(index++, new Item(packageItem));
+			_data.put(index++, packageItem);
 		}
 	}
 
@@ -92,7 +75,7 @@ public class PackagesTableModel extends DefaultTableModel
 		if (_data == null)
 			return null;
 
-		Item item = _data.get(row);
+		Package item = _data.get(row);
 
 		Object ret = null;
 
@@ -102,19 +85,19 @@ public class PackagesTableModel extends DefaultTableModel
 		{
 			switch (col) {
 				case 0:
-					ret = item.packageItem.getName();
+					ret = item.getName();
 					break;
 				case 1:
-					ret = Double.parseDouble(item.packageItem.getUncompressedSize());
+					ret = Double.parseDouble(item.getUncompressedSize());
 					break;
 				case 2:
-					ret = item.packageItem.getVersion();
+					ret = item.getVersion();
 					break;
 				case 3:
-					ret = item.packageItem.getBuild();
+					ret = item.getBuild();
 					break;
 				case 4:
-					ret = item.packageItem.getLocation();
+					ret = item.getLocation();
 					break;
 			}
 
@@ -124,26 +107,53 @@ public class PackagesTableModel extends DefaultTableModel
 		return ret;
 	}
 	
-	@Override
-	public void setValueAt(Object value, int row, int col) {
-		if (value == null || col > 0)
-			return;
-		
-		_data.get(row).selected = (Boolean) value;
-	}
-
 	public Package getValueAt(int row)
 	{
 		if (_data == null)
 			return null;
 
-		return _data.get(row).packageItem;
+		return _data.get(row);
 	}
 	
 	@Override
 	public boolean isCellEditable(int row, int column)
 	{
-		return (column<=0); // Solo la primera se puedde editar
+		return false;
+	}
+
+	public void addPackage(Package packageItem)
+	{
+		_data.put(_data.size()+1, packageItem);		
+	}
+
+	public void removePackage(Package packageItem)
+	{
+		if (!_data.containsValue(packageItem))
+			return;
+		
+		for (Integer index : _data.keySet())
+		{
+			if (_data.get(index).equalsExact(packageItem))
+			{
+				_data.remove(index);
+				break;
+			}
+		}
+	}
+
+	public void updatePackage(Package packageItem)
+	{
+		if (!_data.containsValue(packageItem))
+			return;
+		
+		for (Integer index : _data.keySet())
+		{
+			if (_data.get(index).equals(packageItem))
+			{
+				_data.put(index, packageItem);
+				break;
+			}
+		}		
 	}
 
 	private static final long	serialVersionUID	= -502859337667720942L;

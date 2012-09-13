@@ -19,6 +19,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
@@ -34,21 +36,24 @@ import com.jgoodies.forms.layout.RowSpec;
 
 public class PackagesList extends JPanel
 {
-	// private PackageManager packageManager = null;
-
-	private PackagesTable		 table            = null;
-	private JTextField	 txtFilter        = null;
-	private final JLabel lblPackageCount  = new JLabel();
-	JPanel panelButtonsActions = new JPanel();
+	private PackagesTable	table				= null;
+	private JTextField		txtFilter			= null;
+	private final JLabel	lblPackageCount		= new JLabel();
+	private JPanel					panelButtonsActions	= new JPanel();
 	
-//	private long lastTimeTyped = 0;
+	private JButton btnBulkUpgrade = new JButton(ResourceMap.getInstance().getString("packagesList.button.upgrade.text"));
+	private JButton btnBulkRemove = new JButton(ResourceMap.getInstance().getString("packagesList.button.remove.text"));
+	private JButton btnBulkInstall = new JButton(ResourceMap.getInstance().getString("packagesList.button.install.text"));
+
+	private PackageManager packageManager = null;
 	
 	public PackagesList(PackageManager packageManager)
 	{
 		super();
+		this.packageManager = packageManager;
 		setLayout(new BorderLayout(0, 0));
 		final JSplitPane splitPane = new JSplitPane();
-		
+
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		add(splitPane);
@@ -65,18 +70,19 @@ public class PackagesList extends JPanel
 			@Override
 			public void keyReleased(KeyEvent event)
 			{
-//				long timeTyped = System.currentTimeMillis(); 
-//				long diff = (timeTyped-lastTimeTyped); 
-//				System.out.println("lastTimeTyped: " + lastTimeTyped + " | timeTyped: " + timeTyped + " | diff: " + diff );
-//				if ( diff > 1000 )
-//				{
-					JTextField source = (JTextField) event.getSource();
-//					System.out.println("source length: " + source.getText().length() );
-//					if (source.getText().length()>3)
-						table.filter(source.getText());
-//				}
-//				lastTimeTyped = timeTyped;
-//				super.keyTyped(event);
+				// long timeTyped = System.currentTimeMillis();
+				// long diff = (timeTyped-lastTimeTyped);
+				// System.out.println("lastTimeTyped: " + lastTimeTyped + " | timeTyped: " + timeTyped + " | diff: " + diff );
+				// if ( diff > 1000 )
+				// {
+				// JTextField source = (JTextField) event.getSource();
+				// table.filter(source.getText());
+				// System.out.println("source length: " + source.getText().length() );
+				// if (source.getText().length()>3)
+				filter();
+				// }
+				// lastTimeTyped = timeTyped;
+				// super.keyTyped(event);
 			}
 		});
 		filterPanel.add(txtFilter, "1, 2, fill, top");
@@ -87,23 +93,24 @@ public class PackagesList extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				String text = txtFilter.getText();
-				table.filter(text);
+				filter();
+				// String text = txtFilter.getText();
+				// table.filter(text);
 			}
 		});
 		filterPanel.add(btnFiltrar, "2, 2");
-		
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout(0, 0));
-//		add(panel, BorderLayout.NORTH);
-		
+		// add(panel, BorderLayout.NORTH);
+
 		final JScrollPane scrollPane = new JScrollPane();
 		panel.add(scrollPane);
-				
+
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		
+
 		table = new PackagesTable();
-		
+
 		table.addMouseListener(new MouseAdapter()
 		{
 			@Override
@@ -114,97 +121,195 @@ public class PackagesList extends JPanel
 					PackagesTableModel model = (PackagesTableModel) table.getModel();
 					int indexSelectedRow = table.getSelectedRow();
 					indexSelectedRow = table.convertRowIndexToModel(indexSelectedRow);
-					
+
 					Package selectedPackage = model.getValueAt(indexSelectedRow);
 					showPackageInformation(selectedPackage);
 				}
 			}
 		});
-		
+
 		scrollPane.setViewportView(table);
 		splitPane.setBottomComponent(panel);
-		
+
 		FlowLayout fl_panelButtonsActions = (FlowLayout) panelButtonsActions.getLayout();
 		fl_panelButtonsActions.setHgap(1);
 		fl_panelButtonsActions.setAlignment(FlowLayout.LEFT);
 		fl_panelButtonsActions.setVgap(2);
 		panel.add(panelButtonsActions, BorderLayout.SOUTH);
-		
+
 		JPanel panelAcciones = new JPanel();
 		panelAcciones.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packagesList.panel.actions.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelButtonsActions.add(panelAcciones);
-		
-		JButton btnInstallSelected = new JButton(ResourceMap.getInstance().getString("packagesList.button.install.text"));
-		panelAcciones.add(btnInstallSelected);
-		
-		JButton btnActualizar = new JButton(ResourceMap.getInstance().getString("packagesList.button.upgrade.text"));
-		panelAcciones.add(btnActualizar);
-		
-		JButton btnEliminar = new JButton(ResourceMap.getInstance().getString("packagesList.button.remove.text"));
-		panelAcciones.add(btnEliminar);
-		
+
+		btnBulkInstall.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				bulkInstall();
+			}
+		});
+		panelAcciones.add(btnBulkInstall);
+
+		btnBulkUpgrade.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				bulkUpgrade();
+			}
+		});
+		panelAcciones.add(btnBulkUpgrade);
+
+		btnBulkRemove.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				bulkRemove();
+			}
+		});
+		panelAcciones.add(btnBulkRemove);
+
 		JPanel panelBlackList = new JPanel();
 		panelBlackList.setBorder(new TitledBorder(null, ResourceMap.getInstance().getString("packagesList.panel.blacklist.border.text"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelButtonsActions.add(panelBlackList);
-		
+
 		JCheckBox chckbxShowHideBlacklist = new JCheckBox(ResourceMap.getInstance().getString("packagesList.ckeckbox.showHide.text"));
-		panelBlackList.add(chckbxShowHideBlacklist);
-		
-		JButton btnAgregar = new JButton(ResourceMap.getInstance().getString("packagesList.button.addBlackList.text"));
-		panelBlackList.add(btnAgregar);
-		
-		JButton btnEliminar_1 = new JButton(ResourceMap.getInstance().getString("packagesList.button.removeBlackList.text"));
-		panelBlackList.add(btnEliminar_1);
-		btnInstallSelected.addActionListener(new ActionListener() {
+		chckbxShowHideBlacklist.addChangeListener(new ChangeListener()
+		{
+
 			@Override
-			public void actionPerformed(ActionEvent event) {
-				List<Package> list = table.getSelectedPackages();
-				if (list.size()>0)
-				{
-					System.out.println("SELECTED PACKAGES ===============");
-					for (Package item : list)
-						System.out.println("selected: "+item.getName());
-					System.out.println("===============");
-				}
-				
-//				int[] indexSelectedRow = table.getSelectedRows();
-//				
-//				if (indexSelectedRow.length>0)
-//					System.out.println("SELECTED PACKAGES ===============");
-//				for (int index : indexSelectedRow)
-//				{
-//					index = table.convertRowIndexToModel(index);
-//					Package selectedPackage = ((PackagesTableModel) table.getModel()).getValueAt(index);
-//					System.out.println(selectedPackage.getName());
-//				}
-//				System.out.println("===============");
-				
-//				
-//				Package selectedPackage = model.getValueAt(indexSelectedRow);
-//
-//				List<Package> list = ((PackagesTableModel) table.getModel()).getSelected();
-//				for (Package item : list)
-//					System.out.println("selected: "+item.getName());
+			public void stateChanged(ChangeEvent e)
+			{
+				// TODO: Ver que manda muchos eventos
+				JCheckBox source = (JCheckBox) e.getSource();
+				showHideBlackList(source.isSelected());
 			}
 		});
-		
+
+		panelBlackList.add(chckbxShowHideBlacklist);
+
+		JButton btnBulkBlackListAdd = new JButton(ResourceMap.getInstance().getString("packagesList.button.addBlackList.text"));
+		btnBulkBlackListAdd.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				bulkBlackListAdd();
+			}
+		});
+		panelBlackList.add(btnBulkBlackListAdd);
+
+		JButton btnBulkBlackListRemove = new JButton(ResourceMap.getInstance().getString("packagesList.button.removeBlackList.text"));
+		btnBulkBlackListRemove.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				bulkBlackListRemove();
+			}
+		});
+		panelBlackList.add(btnBulkBlackListRemove);
+
 		add(lblPackageCount, BorderLayout.SOUTH);
 	}
 
+	private void showHideBlackList(boolean show)
+	{
+		System.out.println("showHideBlackList::show: " + show);
+	}
+
+	private void bulkInstall()
+	{
+		List<Package> list = table.getSelectedPackages();
+		packageManager.install(list);
+	}
+
+	private void bulkRemove()
+	{
+		List<Package> list = table.getSelectedPackages();
+		packageManager.remove(list);
+	}
+
+	private void bulkUpgrade()
+	{
+		List<Package> list = table.getSelectedPackages();
+		packageManager.upgrade(list);
+	}
+
+	private void bulkBlackListAdd()
+	{
+		//TODO: Preguntar si:
+		// 1.- Abrir popup BlackListRegexp para crear una nueva regex
+		// 2.- Agregar item por item a la blacklist
+	}
+
+	private void bulkBlackListRemove()
+	{
+		//TODO: Chekear si cada uno de los paquetes pertenece a una regexp o no
+		// Si pertenece a una regex abrir popup BlackListRegexp para editar o eliminar la regex
+	}
+
+	public void enableOnlyBulkInstall()
+	{
+		boolean enable = true; 
+		enableBulkInstall(enable);
+		enableBulkRemove(!enable);
+		enableBulkUpgrade(!enable);
+	}
+	
+	public void enableOnlyBulkRemove()
+	{
+		boolean enable = true; 
+		enableBulkInstall(!enable);
+		enableBulkRemove(enable);
+		enableBulkUpgrade(!enable);
+	}
+
+	public void enableOnlyBulkUpgrade()
+	{
+		boolean enable = true; 
+		enableBulkInstall(!enable);
+		enableBulkRemove(!enable);
+		enableBulkUpgrade(enable);
+	}
+
+	private void enableBulkInstall(boolean enable)
+	{
+		btnBulkInstall.setVisible(enable);
+	}
+	
+	private void enableBulkRemove(boolean enable)
+	{
+		btnBulkRemove.setVisible(enable);
+	}
+	
+	private void enableBulkUpgrade(boolean enable)
+	{
+		btnBulkUpgrade.setVisible(enable);
+	}
+	
 	private void showPackageInformation(Package selectedPackage)
 	{
 		MainUI.getInstance().showPackageInformation(selectedPackage);
 	}
-	
+
 	public void addPackages(List<Package> packages)
 	{
 		resetFilter();
-		
-		if (packages==null || packages.size()==0)
+
+		if (packages == null || packages.size() == 0)
 			return;
-		
+
 		table.setData(packages);
 		lblPackageCount.setText(ResourceMap.getInstance().getString("packagesList.info.packagesSize.text") + packages.size());
+	}
+
+	private void filter()
+	{
+		String text = txtFilter.getText();
+		table.filter(text);
 	}
 
 	private void resetFilter()
@@ -212,6 +317,21 @@ public class PackagesList extends JPanel
 		txtFilter.setText("");
 		table.filter("");
 	}
-	
+
+	public void addPackage(Package packageItem)
+	{
+		table.addPackage(packageItem);		
+	}
+
+	public void removePackage(Package packageItem)
+	{
+		table.removePackage(packageItem);		
+	}
+
+	public void updatePackage(Package packageItem)
+	{
+		table.updatePackage(packageItem);		
+	}
+
 	private static final long	serialVersionUID	= -8724282637131335003L;
 }

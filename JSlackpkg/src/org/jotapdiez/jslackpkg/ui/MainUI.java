@@ -11,19 +11,23 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import org.jotapdiez.jslackpkg.core.entities.Package;
 import org.jotapdiez.jslackpkg.core.impl.JSlackpkgPackageManager;
-import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
+import org.jotapdiez.jslackpkg.core.impl.PackageManagerImpl;
+import org.jotapdiez.jslackpkg.core.observers.impl.InstalledObserver;
+import org.jotapdiez.jslackpkg.core.observers.impl.NewObserver;
+import org.jotapdiez.jslackpkg.core.observers.impl.RemoveObserver;
+import org.jotapdiez.jslackpkg.core.observers.impl.UpgradeObserver;
 import org.jotapdiez.jslackpkg.ui.components.PackageInformation;
 import org.jotapdiez.jslackpkg.ui.components.PackagesList;
 import org.jotapdiez.jslackpkg.ui.components.Settings;
 import org.jotapdiez.jslackpkg.ui.components.custom.StatusBar;
 import org.jotapdiez.jslackpkg.ui.components.custom.splitPane.SplitPane;
 import org.jotapdiez.jslackpkg.utils.ResourceMap;
-import javax.swing.JToolBar;
-import javax.swing.JTabbedPane;
 
 public class MainUI extends JFrame
 {
@@ -39,7 +43,7 @@ public class MainUI extends JFrame
 
 	private final SplitPane splitPane = new SplitPane(false);
     
-	private PackageManager packageManager = null;
+	private PackageManagerImpl packageManager = null;
 	private PackageInformation packageInformation = null;
 	private PackagesList packagesList = null;
 	
@@ -123,11 +127,15 @@ public class MainUI extends JFrame
     	getContentPane().add(tabbedPane, BorderLayout.CENTER);
     	tabbedPane.add(ResourceMap.getInstance().getString("mainui.tabs.packages.text"), splitPane);
     	tabbedPane.add(ResourceMap.getInstance().getString("mainui.tabs.settings.text"), new Settings());
-//    	splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
     	
     	packageInformation = new PackageInformation(packageManager);
-    	packagesList = new PackagesList(packageManager);
+    	packageInformation.setSplitPanel(splitPane);
     	
+    	packagesList = new PackagesList(packageManager);
+		packageManager.loadInstalledPackages();
+
+		showInstalledPackages();
+		
     	splitPane.addTopComponent(packagesList);
     	splitPane.addBottomComponent(packageInformation);
     	
@@ -138,7 +146,8 @@ public class MainUI extends JFrame
 		};
 		Thread t = new Thread(loadsStartup);
 		t.start();
-    	fillPackagesList(packageManager.getInstalledPackages());
+		
+//    	fillPackagesList(packageManager.getInstalledPackages());
 	}
 	
 	private void buildMenuBar()
@@ -259,18 +268,26 @@ public class MainUI extends JFrame
 	}
 	
 	protected void showInstalledPackages() {
+		packageManager.addObserver(new InstalledObserver(packagesList));
+		packagesList.enableOnlyBulkRemove();
 		fillPackagesList(packageManager.getInstalledPackages());
 	}
 
 	protected void doClean() {
-		fillPackagesList(packageManager.getRemovedPackages());
+		packageManager.addObserver(new RemoveObserver(packagesList));
+		packagesList.enableOnlyBulkRemove();
+		fillPackagesList(packageManager.getInstalledPackages());
 	}
 
 	protected void doNew() {
+		packageManager.addObserver(new NewObserver(packagesList));
+		packagesList.enableOnlyBulkInstall();
 		fillPackagesList(packageManager.getNewPackages());
 	}
 
 	protected void doUpgrade() {
+		packageManager.addObserver(new UpgradeObserver(packagesList));
+		packagesList.enableOnlyBulkUpgrade();
 		fillPackagesList(packageManager.getUpgradedPackages());
 	}
 
@@ -287,7 +304,6 @@ public class MainUI extends JFrame
 	
 	private void fillPackagesList(List<Package> packages)
 	{
-		PackagesList packagesList = (PackagesList) splitPane.getTopComponent();
 		packagesList.addPackages( packages );
 	}
 	
@@ -297,9 +313,6 @@ public class MainUI extends JFrame
             @Override
             public void run() {
         		setExtendedState(JFrame.MAXIMIZED_BOTH);
-//            	splitPane.setOneTouchExpandable(true);
-////            	splitPane.getBottomComponent().setMinimumSize(new Dimension());
-//            	splitPane.setDividerLocation(1.0d);
             }
         });
     }
