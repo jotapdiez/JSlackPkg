@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -27,6 +28,7 @@ import org.jotapdiez.jslackpkg.core.interfaces.PackageManager;
 import org.jotapdiez.jslackpkg.ui.MainUI;
 import org.jotapdiez.jslackpkg.ui.components.models.PackagesTable;
 import org.jotapdiez.jslackpkg.ui.components.models.PackagesTableModel;
+import org.jotapdiez.jslackpkg.ui.components.popups.BlackListRegexp;
 import org.jotapdiez.jslackpkg.utils.ResourceMap;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -222,24 +224,48 @@ public class PackagesList extends JPanel
 
 	private void bulkInstall()
 	{
-		List<Package> list = table.getSelectedPackages();
-		packageManager.install(list);
+		Runnable runn = new Runnable() {
+			public void run() {
+				List<Package> list = table.getSelectedPackages();
+				packageManager.install(list);
+			}
+		};
+		Thread t = new Thread(runn);
+		t.start();
 	}
 
 	private void bulkRemove()
 	{
-		List<Package> list = table.getSelectedPackages();
-		packageManager.remove(list);
+		Runnable runn = new Runnable() {
+			public void run() {
+				List<Package> list = table.getSelectedPackages();
+				packageManager.remove(list);
+			}
+		};
+		Thread t = new Thread(runn);
+		t.start();
 	}
 
 	private void bulkUpgrade()
 	{
-		List<Package> list = table.getSelectedPackages();
-		packageManager.upgrade(list);
+		Runnable runn = new Runnable() {
+			public void run() {
+				List<Package> list = table.getSelectedPackages();
+				packageManager.upgrade(list);
+			}
+		};
+		Thread t = new Thread(runn);
+		t.start();
 	}
 
+	BlackListRegexp popupBlackListRegex = null;
 	private void bulkBlackListAdd()
 	{
+		if (popupBlackListRegex == null)
+			popupBlackListRegex = new BlackListRegexp(null);
+		
+		popupBlackListRegex.setPackages(table.getSelectedPackages());
+		popupBlackListRegex.setVisible(true);
 		//TODO: Preguntar si:
 		// 1.- Abrir popup BlackListRegexp para crear una nueva regex
 		// 2.- Agregar item por item a la blacklist

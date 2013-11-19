@@ -285,10 +285,24 @@ public class JSlackpkgPackageManager extends PackageManagerImpl
 
 		String packageLocalFile = HTTPUtils.downloadFile(settingsManager.getOption(SettingsManager.Section.REPO, "mirror") + "/slackware/" + packageItem.getLocation() + "/", packageItem.getFileName());
 
+		if (packageLocalFile == null || packageLocalFile.equals(""))
+			return false;
+		
+		StatusBar.getInstance().setFocusComponentText("Actualizando "+packageItem.getName() + " a "+packageItem.getFullName()); //TODO: Al archivo de lenguajes
+		StatusBar.getInstance().startIndeterminated();
 		boolean succesfull = runPackageCommand("upgradepkg", packageLocalFile);
 		
 		if (!succesfull)
 			return false; // No fue actualizado
+		
+		boolean isInstalled = isPackageInstalled(packageItem.getFileName());
+		if (isInstalled)
+		{
+			packageItem.setState(STATE.INSTALLED);
+			StatusBar.getInstance().setFocusComponentText(packageItem.getFullName() + " eliminado correctamente"); //TODO: Al archivo de lenguajes
+		}else
+			StatusBar.getInstance().setFocusComponentText("Error al instalar "+packageItem.getFullName()); //TODO: Al archivo de lenguajes
+		StatusBar.getInstance().stopIndeterminated();
 		
 		if (getInstalledPackagesMap().containsValue(packageItem))
 		{
@@ -318,6 +332,8 @@ public class JSlackpkgPackageManager extends PackageManagerImpl
 		logger.debug("Removing package: " + packageItem.getName());
 
 		String packageLocalFile = packageItem.getName();
+		StatusBar.getInstance().setFocusComponentText("Eliminando "+packageItem.getFullName()); //TODO: Al archivo de lenguajes
+		StatusBar.getInstance().startIndeterminated();
 
 		boolean succesfull = runPackageCommand("removepkg", packageLocalFile);
 
@@ -335,6 +351,13 @@ public class JSlackpkgPackageManager extends PackageManagerImpl
 		
 		setChanged();
 		notifyObservers(packageItem, MODE.REMOVED);
+		
+		if (!isInstalled)
+		{
+			StatusBar.getInstance().setFocusComponentText(packageItem.getFullName() + " eliminado correctamente"); //TODO: Al archivo de lenguajes
+		}else
+			StatusBar.getInstance().setFocusComponentText("Error al eliminar "+packageItem.getFullName()); //TODO: Al archivo de lenguajes
+		StatusBar.getInstance().stopIndeterminated();
 		
 		return !isInstalled;
 	}
@@ -395,6 +418,8 @@ public class JSlackpkgPackageManager extends PackageManagerImpl
 
 		logger.debug(packageLocalFile);
 
+		StatusBar.getInstance().setFocusComponentText("Instalando "+packageItem.getFullName()); //TODO: Al archivo de lenguajes
+		StatusBar.getInstance().startIndeterminated();
 		boolean succesfull = runPackageCommand("installpkg", packageLocalFile);
 
 		if (!succesfull)
@@ -402,8 +427,11 @@ public class JSlackpkgPackageManager extends PackageManagerImpl
 		
 		boolean isInstalled = isPackageInstalled(packageItem.getFileName());
 		if (isInstalled)
+		{
 			packageItem.setState(STATE.INSTALLED);
+		}
 
+		new File(packageLocalFile).delete();
 		if (!getInstalledPackagesMap().containsValue(packageItem))
 			getInstalledPackagesMap().put(packageItem.getName(), packageItem);
 
@@ -415,6 +443,12 @@ public class JSlackpkgPackageManager extends PackageManagerImpl
 		setChanged();
 		notifyObservers(packageItem, MODE.INSTALLED);
 		
+		if (isInstalled)
+		{
+			StatusBar.getInstance().setFocusComponentText(packageItem.getFullName() + " instalado correctamente"); //TODO: Al archivo de lenguajes
+		}else
+			StatusBar.getInstance().setFocusComponentText("Error al instalar "+packageItem.getFullName()); //TODO: Al archivo de lenguajes
+		StatusBar.getInstance().stopIndeterminated();
 		return isInstalled;
 	}
 

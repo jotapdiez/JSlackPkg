@@ -71,9 +71,9 @@ public class HTTPUtils
 //			String state = "Descargando: ";
 //			infoPanel.setState(state);
 //			infoPanel.updateProgress(0);
-//			logger.debug("downloadFile:"+remoteFile+" to "+localFile);
+			logger.debug("downloadFile:URL: "+sourceUrl);
 
-			URL url = new URL(sourceUrl); //
+			URL url = new URL(sourceUrl+fileName); //
 			URLConnection conexion = url.openConnection();
 			conexion.connect();
 
@@ -87,6 +87,7 @@ public class HTTPUtils
 			if (!local.exists())
 				local.createNewFile();
 			
+			logger.debug("downloadFile:Local: "+local.getAbsolutePath());
 			OutputStream output = new FileOutputStream(local);
 
 			byte data[] = new byte[8192];

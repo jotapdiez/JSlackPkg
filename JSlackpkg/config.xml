@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE preferences SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<preferences EXTERNAL_XML_VERSION="1.0">
+  <root type="user">
+    <map/>
+    <node name="org">
+      <map/>
+      <node name="jotapdiez">
+        <map/>
+        <node name="jslackpkg">
+          <map/>
+          <node name="general">
+            <map>
+              <entry key="languaje" value="es_AR"/>
+              <entry key="showSplash" value="false"/>
+            </map>
+          </node>
+          <node name="interface">
+            <map>
+              <entry key="lag" value="substance"/>
+              <entry key="useTabs" value="true"/>
+            </map>
+          </node>
+          <node name="others">
+            <map>
+              <entry key="apiToUse" value="default"/>
+              <entry key="checkUpdates" value="true"/>
+            </map>
+          </node>
+          <node name="repo">
+            <map>
+              <entry key="mirror" value="http://slackware.mirrors.tds.net/pub/slackware/slackware-current/"/>
+            </map>
+          </node>
+        </node>
+      </node>
+    </node>
+  </root>
+</preferences>

@@ -54,7 +54,7 @@ public class BlackListManager
 	private FileWriter getFileWriter()
 	{
 		try {
-			if (_blFileWriter == null)
+//			if (_blFileWriter == null)
 				_blFileWriter = new FileWriter(userBlacklistFile, false);
 			return _blFileWriter;
 		} catch (IOException e) {
@@ -120,29 +120,30 @@ public class BlackListManager
 	
 	public void remove(Package packageItem)
 	{
-		getList(BL_TYPE_PACKAGE).remove(packageItem); //Ver si se le pasa una version diferente al que esta guardado
+		getList(BL_TYPE_PACKAGE).remove(packageItem); //TODO: Ver si se le pasa una version diferente al que esta guardado
 		flush();
 	}
 	
 	private synchronized void flush()
 	{
 		try {
-			getFileWriter().write("# BL_TYPE_REGEX"+"\n");
+			FileWriter fw = getFileWriter();
+			fw.write("# BL_TYPE_REGEX"+"\n");
 			for (Object regex : getList(BL_TYPE_REGEX))
 			{
-				getFileWriter().write(regex.toString()+"\n");
+				fw.write(regex.toString()+"\n");
 				logger.debug("Escribiendo Blacklist (BL_TYPE_REGEX) " + regex.toString());
 			}
 			
-			getFileWriter().write("# BL_TYPE_PACKAGE"+"\n");
+			fw.write("# BL_TYPE_PACKAGE"+"\n");
 			for (Object packageItem : getList(BL_TYPE_PACKAGE))
 			{
 				Package item = (Package) packageItem;
-				getFileWriter().write(item.getName() + " # "+item.getFileName()+"\n");
+				fw.write(item.getName() + " # "+item.getFileName()+"\n");
 				logger.debug("Escribiendo Blacklist (BL_TYPE_PACKAGE) " + item.getName() + " # "+item.getFileName());
 			}
 			
-			getFileWriter().flush();
+			fw.flush();
 		} catch (IOException e) {
 			logger.error("flush", e);
 		}

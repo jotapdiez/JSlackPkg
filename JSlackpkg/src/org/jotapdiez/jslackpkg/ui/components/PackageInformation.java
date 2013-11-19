@@ -155,6 +155,14 @@ public class PackageInformation extends JPanel
 					doInstall(_packageItem);
 				}
 			});
+			btnUpgrade.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					doUpgrade(_packageItem);
+				}
+			});
 			btnUninstall.addActionListener(new ActionListener()
 			{
 				@Override
@@ -203,38 +211,65 @@ public class PackageInformation extends JPanel
 		updateButtons();
 	}
 
-	private void doRemove(Package packageItem)
+	private void doRemove(final Package packageItem)
 	{
-		if (packageItem == null)
-			return;
+		Runnable runn = new Runnable() {
+			public void run() {
+				if (packageItem == null)
+					return;
 
-		boolean succesful = packageManager.remove(packageItem);
-		if (succesful)
-		{
-			setPackage(null);
-			parent.hidePanel();
-		}
+				boolean succesful = packageManager.remove(packageItem);
+				if (succesful)
+				{
+					setPackage(null);
+					parent.hidePanel();
+				}
+			}
+		};
+		Thread t = new Thread(runn);
+		t.start();
 	}
 
-	private void doInstall(Package packageItem)
+	private void doInstall(final Package packageItem)
 	{
-		if (packageItem == null)
-			return;
+		Runnable runn = new Runnable() {
+			public void run() {
+				if (packageItem == null)
+					return;
 
-		boolean succesful = packageManager.install(packageItem);
-		if (succesful)
-			setPackage(packageItem);
+				boolean succesful = packageManager.install(packageItem);
+				if (succesful)
+					setPackage(packageItem);
+			}
+		};
+		Thread t = new Thread(runn);
+		t.start();
+	}
+
+	private void doUpgrade(final Package packageItem)
+	{
+		Runnable runn = new Runnable() {
+			public void run() {
+				if (packageItem == null)
+					return;
+
+				boolean succesful = packageManager.upgrade(packageItem);
+				if (succesful)
+					setPackage(packageItem);
+			}
+		};
+		Thread t = new Thread(runn);
+		t.start();
 	}
 
 	public void setPackage(Package packageItem)
 	{
+		cleanPackage();
+		
 		_packageItem = packageItem;
 
 		if (_packageItem == null)
-		{
-			cleanPackage();
 			return;
-		}
 
 		mapPackage();
 	}
@@ -277,17 +312,21 @@ public class PackageInformation extends JPanel
 
 	private void updateButtons()
 	{
-		boolean installed = _packageItem != null && _packageItem.getState().equals(Package.STATE.INSTALLED);
+		boolean toUpgrade = _packageItem != null && _packageItem.getState().equals(Package.STATE.TO_UPGRADE);
+		btnUpgrade.setVisible(toUpgrade);
+		
+		if (!toUpgrade)
+		{
+			boolean installed = _packageItem != null && _packageItem.getState().equals(Package.STATE.INSTALLED);
 
-		btnInstall.setVisible(!installed);
-		btnUninstall.setVisible(installed);
+			btnInstall.setVisible(!installed);
+			btnUninstall.setVisible(installed);
+		}
 
 		boolean isInBlackList = _packageItem != null && _packageItem.isInBlackList();
 		btnBlackListAdd.setVisible(!isInBlackList);
 		btnBlackListRemove.setVisible(isInBlackList);
 
-		boolean toUpgrade = _packageItem != null && _packageItem.getState().equals(Package.STATE.TO_UPGRADE);
-		btnUpgrade.setVisible(toUpgrade);
 	}
 
 	public void setSplitPanel(SplitPane splitPane)
